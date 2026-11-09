@@ -1,0 +1,16 @@
+.env
+venv/
+.venv/
+__pycache__/
+*.pyc
+.DS_Store
+__MACOSX/
+.pytest_cache/
+# Dữ liệu lớn không đưa lên git (giữ lại .gitkeep và sample)
+data/raw/*.csv
+data/raw/*.zip
+data/raw/DATA_SOURCE.json
+models/*.joblib
+models/*.npz
+models/*.parquet
+models/psi_baseline.json
