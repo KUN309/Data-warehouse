@@ -15,11 +15,21 @@ docs/ERD.md                       thiết kế lược đồ
 ```
 
 ## 1. Cài đặt
+
+### Cách 1: Chạy nhanh bằng Docker (Khuyến nghị)
+Chạy toàn bộ hệ thống (SQL Server 2022 + Streamlit Dashboard DSS) chỉ với 1 lệnh:
+```bash
+docker compose up -d --build
+```
+* **Streamlit Dashboard**: truy cập tại `http://localhost:8501`
+* **SQL Server**: cổng `1433` (mật khẩu mặc định `Password123!`)
+
+### Cách 2: Cài đặt thủ công trên máy
 ```bash
 python -m venv venv && source venv/bin/activate        # Windows: venv\Scripts\activate
 pip install -r requirements.txt
 cp .env.example .env                                    # rồi điền MSSQL_SA_PASSWORD
-docker start sqlserver                                  # container SQL Server của bạn
+docker compose up -d sqlserver                         # hoặc tự chạy container SQL Server
 ```
 
 ## 2. Dữ liệu

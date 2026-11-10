@@ -1,0 +1,14 @@
+.git
+.gitignore
+.venv
+venv
+__pycache__
+*.pyc
+.DS_Store
+.env
+data/raw/*.csv
+data/raw/*.zip
+models/*.joblib
+models/*.parquet
+models/*.npz
+.pytest_cache
