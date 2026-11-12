@@ -58,7 +58,7 @@ def download_from_kaggle():
     print("Đã giải nén 3 file cần dùng.")
 
 
-def make_sample(n: int = 1000):
+def make_sample(n: int = 10_000):
     """Mẫu nhỏ, NHẤT QUÁN giữa 3 bảng (cùng tập SK_ID_CURR) để chia sẻ cho các thành viên khác."""
     os.makedirs(SAMPLE_DIR, exist_ok=True)
     app = pd.read_csv(os.path.join(RAW_DIR, "application_train.csv"), nrows=n)
@@ -70,7 +70,7 @@ def make_sample(n: int = 1000):
         parts = [c[c["SK_ID_CURR"].isin(ids)] for c in
                  pd.read_csv(os.path.join(RAW_DIR, src), usecols=cols, chunksize=500_000)]
         pd.concat(parts).to_csv(os.path.join(SAMPLE_DIR, out), index=False)
-    print(f"Đã tạo mẫu {n} hồ sơ trong {SAMPLE_DIR}")
+    print(f"Đã tạo mẫu {n:,} hồ sơ trong {SAMPLE_DIR}")
 
 
 def generate_synthetic(n: int = 25_000, seed: int = 42):
@@ -153,6 +153,7 @@ def main():
     parser.add_argument("--synthetic", action="store_true", help="sinh dữ liệu mô phỏng để kiểm thử")
     parser.add_argument("--n", type=int, default=25_000, help="số hồ sơ mô phỏng")
     parser.add_argument("--force", action="store_true", help="cho phép ghi đè dữ liệu đang có")
+    parser.add_argument("--sample-size", type=int, default=10_000, help="số hồ sơ tạo trong data/sample (mặc định: 10.000)")
     args = parser.parse_args()
 
     if args.download:
@@ -184,7 +185,7 @@ def main():
         print("CẢNH BÁO: đây là dữ liệu MÔ PHỎNG, không dùng cho kết luận nghiệp vụ.")
     else:
         print(f"LƯU Ý: số hồ sơ khác {FULL_TRAIN_ROWS:,}. Nếu đây không phải bản Kaggle đầy đủ, hãy kiểm tra lại.")
-    make_sample()
+    make_sample(args.sample_size)
 
 
 if __name__ == "__main__":
