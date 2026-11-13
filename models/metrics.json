@@ -1,0 +1,333 @@
+{
+  "meta": {
+    "n_train": 184506,
+    "n_val": 61502,
+    "n_test": 61503,
+    "base_rate_pct": 8.07,
+    "data_source": "kaggle",
+    "default_costs": {
+      "c_fn": 10.0,
+      "c_fp": 1.0
+    },
+    "trained_at": "2026-11-12T14:26:07"
+  },
+  "scorecard": {
+    "base_score": 600.0,
+    "base_odds": 50.0,
+    "pdo": 20.0
+  },
+  "models": {
+    "Logistic Regression": {
+      "roc_auc": 0.7507,
+      "pr_auc": 0.2383,
+      "brier": 0.06812,
+      "optimal_threshold": 0.1,
+      "precision": 0.1812,
+      "recall": 0.5964,
+      "f1_score": 0.2779,
+      "confusion_matrix": [
+        [
+          43157,
+          13381
+        ],
+        [
+          2004,
+          2961
+        ]
+      ],
+      "policy_at_default_costs": {
+        "threshold": 0.1,
+        "tn": 43157,
+        "fp": 13381,
+        "fn": 2004,
+        "tp": 2961,
+        "confusion_matrix": [
+          [
+            43157,
+            13381
+          ],
+          [
+            2004,
+            2961
+          ]
+        ],
+        "cost": 33421.0,
+        "cost_approve_all": 49650.0,
+        "cost_reject_all": 56538.0,
+        "savings_vs_approve_all": 16229.0,
+        "savings_pct_vs_approve_all": 32.68680765357502,
+        "savings_pct_vs_best_baseline": 32.68680765357502,
+        "reject_rate_pct": 26.571061574232154,
+        "bad_caught_pct": 59.637462235649544
+      },
+      "calibration": [
+        {
+          "pred": 0.0121,
+          "actual": 0.0143,
+          "n": 6151
+        },
+        {
+          "pred": 0.0217,
+          "actual": 0.0234,
+          "n": 6150
+        },
+        {
+          "pred": 0.0303,
+          "actual": 0.0298,
+          "n": 6150
+        },
+        {
+          "pred": 0.0396,
+          "actual": 0.0343,
+          "n": 6150
+        },
+        {
+          "pred": 0.0502,
+          "actual": 0.0468,
+          "n": 6151
+        },
+        {
+          "pred": 0.0634,
+          "actual": 0.0644,
+          "n": 6150
+        },
+        {
+          "pred": 0.0805,
+          "actual": 0.0793,
+          "n": 6150
+        },
+        {
+          "pred": 0.1049,
+          "actual": 0.1008,
+          "n": 6150
+        },
+        {
+          "pred": 0.1439,
+          "actual": 0.1467,
+          "n": 6150
+        },
+        {
+          "pred": 0.2586,
+          "actual": 0.2674,
+          "n": 6151
+        }
+      ],
+      "tiers": {
+        "cutoffs": [
+          0.056677532582908294,
+          0.1218849487223048,
+          0.23698454372571415
+        ],
+        "table": [
+          {
+            "tier": "A",
+            "n": 30839,
+            "share_pct": 50.14,
+            "default_rate_pct": 2.97
+          },
+          {
+            "tier": "B",
+            "n": 18593,
+            "share_pct": 30.23,
+            "default_rate_pct": 8.22
+          },
+          {
+            "tier": "C",
+            "n": 9118,
+            "share_pct": 14.83,
+            "default_rate_pct": 16.74
+          },
+          {
+            "tier": "D",
+            "n": 2953,
+            "share_pct": 4.8,
+            "default_rate_pct": 33.73
+          }
+        ]
+      }
+    },
+    "XGBoost": {
+      "roc_auc": 0.7588,
+      "pr_auc": 0.2497,
+      "brier": 0.06757,
+      "optimal_threshold": 0.095,
+      "precision": 0.1829,
+      "recall": 0.6246,
+      "f1_score": 0.2829,
+      "confusion_matrix": [
+        [
+          42684,
+          13854
+        ],
+        [
+          1864,
+          3101
+        ]
+      ],
+      "policy_at_default_costs": {
+        "threshold": 0.095,
+        "tn": 42684,
+        "fp": 13854,
+        "fn": 1864,
+        "tp": 3101,
+        "confusion_matrix": [
+          [
+            42684,
+            13854
+          ],
+          [
+            1864,
+            3101
+          ]
+        ],
+        "cost": 32494.0,
+        "cost_approve_all": 49650.0,
+        "cost_reject_all": 56538.0,
+        "savings_vs_approve_all": 17156.0,
+        "savings_pct_vs_approve_all": 34.55387713997986,
+        "savings_pct_vs_best_baseline": 34.55387713997986,
+        "reject_rate_pct": 27.56776092223144,
+        "bad_caught_pct": 62.45720040281974
+      },
+      "calibration": [
+        {
+          "pred": 0.0132,
+          "actual": 0.0132,
+          "n": 6151
+        },
+        {
+          "pred": 0.0218,
+          "actual": 0.0193,
+          "n": 6150
+        },
+        {
+          "pred": 0.0295,
+          "actual": 0.0286,
+          "n": 6150
+        },
+        {
+          "pred": 0.038,
+          "actual": 0.0356,
+          "n": 6150
+        },
+        {
+          "pred": 0.048,
+          "actual": 0.0506,
+          "n": 6151
+        },
+        {
+          "pred": 0.0606,
+          "actual": 0.0587,
+          "n": 6150
+        },
+        {
+          "pred": 0.0775,
+          "actual": 0.075,
+          "n": 6150
+        },
+        {
+          "pred": 0.1032,
+          "actual": 0.1033,
+          "n": 6150
+        },
+        {
+          "pred": 0.1456,
+          "actual": 0.1476,
+          "n": 6150
+        },
+        {
+          "pred": 0.2683,
+          "actual": 0.2754,
+          "n": 6151
+        }
+      ],
+      "tiers": {
+        "cutoffs": [
+          0.05403635464608669,
+          0.12167262434959415,
+          0.24413835704326625
+        ],
+        "table": [
+          {
+            "tier": "A",
+            "n": 30875,
+            "share_pct": 50.2,
+            "default_rate_pct": 2.96
+          },
+          {
+            "tier": "B",
+            "n": 18538,
+            "share_pct": 30.14,
+            "default_rate_pct": 7.95
+          },
+          {
+            "tier": "C",
+            "n": 9107,
+            "share_pct": 14.81,
+            "default_rate_pct": 16.98
+          },
+          {
+            "tier": "D",
+            "n": 2983,
+            "share_pct": 4.85,
+            "default_rate_pct": 34.6
+          }
+        ]
+      }
+    }
+  },
+  "business_impact": {
+    "threshold": 0.095,
+    "tn": 42684,
+    "fp": 13854,
+    "fn": 1864,
+    "tp": 3101,
+    "confusion_matrix": [
+      [
+        42684,
+        13854
+      ],
+      [
+        1864,
+        3101
+      ]
+    ],
+    "cost": 32494.0,
+    "cost_approve_all": 49650.0,
+    "cost_reject_all": 56538.0,
+    "savings_vs_approve_all": 17156.0,
+    "savings_pct_vs_approve_all": 34.55387713997986,
+    "savings_pct_vs_best_baseline": 34.55387713997986,
+    "reject_rate_pct": 27.56776092223144,
+    "bad_caught_pct": 62.45720040281974
+  },
+  "feature_columns": {
+    "numeric": [
+      "SoTienVay",
+      "ThuNhap",
+      "TienTraHangKy",
+      "GiaTriHangHoa",
+      "TuoiKhiVay",
+      "SoNamLamViec",
+      "DiemNgoai1",
+      "DiemNgoai2",
+      "DiemNgoai3",
+      "HangKhuVuc",
+      "SoKhoanVayTruoc",
+      "SoKhoanBiTuChoiTruoc",
+      "SoKhoanTinDungBureau",
+      "TyLeVayTrenThuNhap"
+    ],
+    "categorical": [
+      "GioiTinh",
+      "NhomTuoi",
+      "TrinhDoHocVan",
+      "TinhTrangHonNhan",
+      "LoaiNhaO",
+      "LoaiThuNhap",
+      "TenLoai",
+      "NhomKyHan",
+      "NhomToChuc"
+    ]
+  }
+}

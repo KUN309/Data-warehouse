@@ -34,11 +34,270 @@ from src.dss.credit_scoring_model import (  # noqa: E402
 )
 from src.utils.transform_rules import DAYS_ORDER, OPTIONS, ORG_GROUPS, term_months  # noqa: E402
 
-st.set_page_config(page_title="CO4031 - Credit Risk DW & DSS", page_icon="💳", layout="wide")
+st.set_page_config(
+    page_title="Credit Risk DW & DSS | CO4031",
+    page_icon="💳",
+    layout="wide",
+    initial_sidebar_state="expanded",
+)
 
-CURRENCY = "đơn vị tiền"   # Home Credit ẩn danh đơn vị tiền tệ nên không gắn nhãn VND
+CURRENCY = "đơn vị tiền"
 TIER_COLORS = {"A": "#10B981", "B": "#3B82F6", "C": "#F59E0B", "D": "#EF4444"}
 TIER_TEXT = {"A": "Rủi ro rất thấp", "B": "Rủi ro thấp", "C": "Rủi ro trung bình", "D": "Rủi ro cao"}
+
+# ============================================================================= Custom CSS Styling
+CUSTOM_CSS = """
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+  html, body, [class*="css"] {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+
+  /* Main background styling */
+  .stApp {
+      background-color: #f8fafc;
+  }
+
+  /* Header banner */
+  .hero-banner {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #1e3a8a 100%);
+      color: white;
+      padding: 24px 32px;
+      border-radius: 16px;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.25);
+  }
+  .hero-title {
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+  }
+  .hero-subtitle {
+      font-size: 14px;
+      color: #94a3b8;
+      margin-top: 6px;
+      margin-bottom: 14px;
+  }
+  .hero-badges {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+  }
+  .hero-badge {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      color: #e2e8f0;
+  }
+  .hero-badge.live {
+      background: rgba(16, 185, 129, 0.2);
+      border-color: rgba(16, 185, 129, 0.4);
+      color: #6ee7b7;
+  }
+
+  /* Metric cards */
+  [data-testid="stMetric"] {
+      background-color: #ffffff;
+      border: 1px solid #e2e8f0;
+      padding: 16px 20px;
+      border-radius: 14px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+      transition: all 0.2s ease;
+  }
+  [data-testid="stMetric"]:hover {
+      border-color: #cbd5e1;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+      transform: translateY(-1px);
+  }
+  [data-testid="stMetricLabel"] p {
+      font-size: 0.8rem !important;
+      font-weight: 600 !important;
+      color: #64748b !important;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+  }
+  [data-testid="stMetricValue"] div {
+      font-size: 1.6rem !important;
+      font-weight: 700 !important;
+      color: #0f172a !important;
+  }
+
+  /* Tabs styling */
+  .stTabs [data-baseweb="tab-list"] {
+      gap: 6px;
+      background-color: #e2e8f0;
+      padding: 6px;
+      border-radius: 12px;
+      border-bottom: none;
+  }
+  .stTabs [data-baseweb="tab"] {
+      border-radius: 8px;
+      padding: 8px 16px;
+      font-weight: 600;
+      font-size: 13.5px;
+      color: #475569;
+      border: none !important;
+      background-color: transparent;
+      transition: all 0.2s ease;
+  }
+  .stTabs [aria-selected="true"] {
+      background-color: #ffffff !important;
+      color: #1e40af !important;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08) !important;
+  }
+
+  /* Form Container */
+  [data-testid="stForm"] {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+  }
+
+  /* Section Card */
+  .ui-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 20px 24px;
+      margin-bottom: 20px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+  }
+  .ui-card-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+  }
+  .ui-card-desc {
+      font-size: 12.5px;
+      color: #64748b;
+      margin-bottom: 16px;
+  }
+
+  /* Decision Result Card */
+  .decision-box {
+      border-radius: 16px;
+      padding: 24px;
+      color: white;
+      margin-bottom: 16px;
+      box-shadow: 0 6px 16px -2px rgba(0,0,0,0.12);
+  }
+  .decision-box.approved {
+      background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+  }
+  .decision-box.rejected {
+      background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+  }
+  .decision-status {
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+  }
+  .decision-tier {
+      display: inline-block;
+      margin-top: 8px;
+      padding: 4px 12px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.22);
+      font-size: 13px;
+      font-weight: 600;
+  }
+
+  /* Credit Score Dial Box */
+  .score-card {
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 18px;
+      text-align: center;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  }
+  .score-number {
+      font-size: 38px;
+      font-weight: 800;
+      color: #1e3a8a;
+      line-height: 1.1;
+  }
+  .score-label {
+      font-size: 12px;
+      text-transform: uppercase;
+      font-weight: 600;
+      color: #64748b;
+      margin-top: 4px;
+  }
+
+  /* Polish Streamlit buttons */
+  .stButton > button {
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 14px;
+      padding: 8px 20px;
+      transition: all 0.2s;
+  }
+  .stButton > button[kind="primary"] {
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+      border: none;
+      box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+  }
+  .stButton > button[kind="primary"]:hover {
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+      transform: translateY(-1px);
+  }
+
+  /* Sidebar styling */
+  [data-testid="stSidebar"] {
+      background-color: #f1f5f9;
+      border-right: 1px solid #e2e8f0;
+  }
+</style>
+"""
+st.markdown(CUSTOM_CSS, unsafe_allow_html=True)
+
+
+def polish_fig(fig: go.Figure, height: int | None = None, title: str | None = None) -> go.Figure:
+    """Tối ưu hóa style cho biểu đồ Plotly sang giao diện hiện đại, sạch sẽ."""
+    fig.update_layout(
+        template="plotly_white",
+        font=dict(family="Inter, sans-serif", size=12, color="#334155"),
+        title=dict(
+            text=f"<b>{title}</b>" if title else "",
+            font=dict(size=14, color="#0f172a", family="Inter, sans-serif"),
+            x=0.01,
+            y=0.96,
+        ) if title else None,
+        margin=dict(l=20, r=20, t=45 if title else 20, b=25),
+        height=height,
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="#ffffff",
+        legend=dict(
+            bgcolor="rgba(255,255,255,0.85)",
+            bordercolor="#e2e8f0",
+            borderwidth=1,
+            font=dict(size=11),
+        ),
+        hoverlabel=dict(
+            bgcolor="#0f172a",
+            font_size=12,
+            font_color="#ffffff",
+            font_family="Inter, sans-serif",
+        ),
+    )
+    fig.update_xaxes(showgrid=True, gridwidth=1, gridcolor="#f1f5f9", zeroline=False)
+    fig.update_yaxes(showgrid=True, gridwidth=1, gridcolor="#f1f5f9", zeroline=False)
+    return fig
 
 
 # ============================================================================= Dữ liệu
@@ -73,19 +332,25 @@ def aggregate_from_parquet(df: pd.DataFrame) -> dict:
     """Phương án dự phòng khi chưa có SQL Server: tính lại các bảng OLAP từ features_v1.parquet."""
     if "TenNhom" in df.columns and "NhomToChuc" not in df.columns:
         df = df.rename(columns={"TenNhom": "NhomToChuc"})
-    kpi = pd.Series({"TongHoSo": len(df), "TongNoXau": int(df["NhanRuiRo"].sum()),
-                     "TyLeRuiRo": float(round(df["NhanRuiRo"].mean() * 100, 2)),
-                     "SoTienVayTB": float(df["SoTienVay"].mean()), "ThuNhapTB": float(df["ThuNhap"].mean())})
+    kpi = pd.Series({
+        "TongHoSo": len(df),
+        "TongNoXau": int(df["NhanRuiRo"].sum()),
+        "TyLeRuiRo": float(round(df["NhanRuiRo"].mean() * 100, 2)),
+        "SoTienVayTB": float(df["SoTienVay"].mean()),
+        "ThuNhapTB": float(df["ThuNhap"].mean()),
+    })
     avg = {"SoTienVayTrungBinh": ("SoTienVay", "mean"), "ThuNhapTrungBinh": ("ThuNhap", "mean")}
     detail = _rate(df, ["NhomToChuc", "TenToChuc"], avg).rename(columns={"TenToChuc": "ToChuc"})
     detail["LaTongToanBo"], detail["LaTongNhom"] = 0, 0
     groups = _rate(df, ["NhomToChuc"], avg)
     groups["ToChuc"], groups["LaTongToanBo"], groups["LaTongNhom"] = "-- TỔNG NHÓM --", 0, 1
-    total = pd.DataFrame([{"NhomToChuc": "-- TẤT CẢ NHÓM --", "ToChuc": "-- TỔNG NHÓM --",
-                           "SoHoSo": len(df), "SoHoSoRuiRo": int(df["NhanRuiRo"].sum()),
-                           "TyLeRuiRo_Pct": round(df["NhanRuiRo"].mean() * 100, 2),
-                           "SoTienVayTrungBinh": df["SoTienVay"].mean(),
-                           "ThuNhapTrungBinh": df["ThuNhap"].mean(), "LaTongToanBo": 1, "LaTongNhom": 1}])
+    total = pd.DataFrame([{
+        "NhomToChuc": "-- TẤT CẢ NHÓM --", "ToChuc": "-- TỔNG NHÓM --",
+        "SoHoSo": len(df), "SoHoSoRuiRo": int(df["NhanRuiRo"].sum()),
+        "TyLeRuiRo_Pct": round(df["NhanRuiRo"].mean() * 100, 2),
+        "SoTienVayTrungBinh": df["SoTienVay"].mean(),
+        "ThuNhapTrungBinh": df["ThuNhap"].mean(), "LaTongToanBo": 1, "LaTongNhom": 1,
+    }])
     prev = df[df["SoKhoanVayTruoc"] > 0]
     return {
         "kpi": kpi, "rollup": pd.concat([detail, groups, total], ignore_index=True),
@@ -93,7 +358,7 @@ def aggregate_from_parquet(df: pd.DataFrame) -> dict:
         "slice": _rate(prev, ["NhomKyHan", "HangKhuVuc"]),
         "matrix": _rate(df, ["TenThu", "NhomGio"]),
         "scores": df["DiemRuiRoDuDoan"].dropna() if "DiemRuiRoDuDoan" in df.columns else pd.Series(dtype=float),
-        "source": "Parquet (chế độ không có SQL Server)",
+        "source": "Parquet (chế độ độc lập không SQL Server)",
     }
 
 
@@ -111,7 +376,7 @@ def load_olap_summary():
             ("slice", "vw_RuiRo_DaTungVay"), ("matrix", "vw_HoSo_Thu_Gio"))}
         scores = pd.read_sql("SELECT DiemRuiRoDuDoan FROM dbo.FACT_HoSoVay WHERE DiemRuiRoDuDoan IS NOT NULL",
                              engine)["DiemRuiRoDuDoan"]
-        return {"kpi": kpi, **views, "scores": scores, "source": "Microsoft SQL Server (trực tiếp)"}
+        return {"kpi": kpi, **views, "scores": scores, "source": "Microsoft SQL Server (kết nối trực tiếp)"}
     except Exception as exc:
         path = os.path.join(PROJECT_ROOT, "data", "shared", "features_v1.parquet")
         if not os.path.exists(path):
@@ -120,149 +385,268 @@ def load_olap_summary():
         return aggregate_from_parquet(pd.read_parquet(path))
 
 
-# ============================================================================= Header
-st.markdown("## Hệ hỗ trợ quyết định & Kho dữ liệu rủi ro tín dụng")
-st.caption("CO4031 - Kho dữ liệu & Hệ hỗ trợ quyết định | Đề tài: phân tích rủi ro tín dụng (Home Credit Default Risk)")
-
+# ============================================================================= Sidebar
 source_info = read_data_source()
+metrics, roc = load_metrics_and_roc()
+ready = models_ready()
+
+with st.sidebar:
+    st.markdown("### 🏢 Hệ Thống Thẩm Định DSS")
+    st.caption("CO4031 - Kho Dữ Liệu & Hỗ Trợ Ra Quyết Định")
+    st.markdown("---")
+
+    st.markdown("#### ⚙️ Trạng Thái Vận Hành")
+    st.markdown(f"**Nguồn dữ liệu:** `{'Kaggle Home Credit' if source_info.get('source') == 'kaggle' else source_info.get('source')}`")
+    if source_info.get("application_rows"):
+        st.markdown(f"**Quy mô:** `{source_info.get('application_rows'):,} hồ sơ`")
+    st.markdown(f"**Mô hình DSS:** {'🟢 Sẵn sàng' if ready else '🔴 Chưa nạp'}")
+
+    if ready and metrics:
+        st.markdown("---")
+        st.markdown("#### 🎯 Hiệu Suất Mô Hình")
+        mm = metrics.get("models", {})
+        if XGB_NAME in mm:
+            st.metric("XGBoost ROC-AUC", f"{mm[XGB_NAME]['roc_auc']:.4f}")
+        if LR_NAME in mm:
+            st.metric("Logistic Reg ROC-AUC", f"{mm[LR_NAME]['roc_auc']:.4f}")
+
+    st.markdown("---")
+    st.caption("💡 Mẹo: Có thể dùng Tab 2 để thẩm định ngay từng hồ sơ vay hoặc Tab 4 để hoạch định chiến lược duyệt vốn.")
+
+
+# ============================================================================= Header Banner
+src_display = "Kaggle Home Credit (307.511 hồ sơ)" if source_info.get("source") == "kaggle" else f"Nguồn: {source_info.get('source')}"
+st.markdown(f"""
+<div class="hero-banner">
+  <div class="hero-title">
+    <span>💳 Hệ Thống Thẩm Định Tín Dụng & Hỗ Trợ Ra Quyết Định (DSS)</span>
+  </div>
+  <div class="hero-subtitle">
+    Đồ án môn học CO4031 - Kho Dữ Liệu & Hỗ Trợ Quyết Định | Tối ưu hóa tổn thất kỳ vọng & Quản trị rủi ro danh mục
+  </div>
+  <div class="hero-badges">
+    <span class="hero-badge live">● Hệ thống sẵn sàng</span>
+    <span class="hero-badge">📦 {src_display}</span>
+    <span class="hero-badge">🧠 Mô hình: XGBoost & Logistic Regression</span>
+    <span class="hero-badge">📊 Giải thích: SHAP & Thẻ điểm</span>
+  </div>
+</div>
+""", unsafe_allow_html=True)
+
 if source_info.get("source") == "synthetic":
-    st.warning("Đang dùng dữ liệu MÔ PHỎNG để kiểm thử. Mọi số liệu bên dưới KHÔNG phản ánh Home Credit thật "
-               "và không được dùng để rút kết luận nghiệp vụ.")
-elif source_info.get("source") == "unknown":
-    st.info("Không xác định được nguồn dữ liệu (thiếu data/raw/DATA_SOURCE.json). "
-            "Chạy: python scripts/prepare_data.py")
+    st.warning("⚠️ Đang sử dụng dữ liệu MÔ PHỎNG để kiểm thử. Số liệu chỉ có tính chất tham khảo kỹ thuật.")
 
 try:
     olap = load_olap_summary()
 except RuntimeError as exc:
     st.error(str(exc))
     st.stop()
-metrics, roc = load_metrics_and_roc()
-ready = models_ready()
 
-tab1, tab2, tab3, tab4, tab5 = st.tabs(["1. Tổng quan OLAP", "2. DSS chấm điểm hồ sơ", "3. Đánh giá mô hình & chi phí",
-                                        "4. Chiến lược danh mục", "5. Giám sát mô hình (PSI)"])
+tab1, tab2, tab3, tab4, tab5 = st.tabs([
+    "📊 1. Tổng quan OLAP",
+    "🎯 2. DSS Chấm điểm hồ sơ",
+    "📈 3. Đánh giá mô hình & Chi phí",
+    "🛡️ 4. Chiến lược danh mục & EL",
+    "🔍 5. Giám sát dịch chuyển (PSI)",
+])
 
-# ============================================================================= Tab 1
+# ============================================================================= Tab 1: OLAP
 with tab1:
-    st.caption(f"Nguồn dữ liệu: {olap['source']}")
+    st.caption(f"📌 Chế độ dữ liệu hiện tại: **{olap['source']}**")
     k = olap["kpi"]
     c1, c2, c3, c4 = st.columns(4)
-    c1.metric("Tổng số hồ sơ", f"{int(k['TongHoSo']):,}")
-    c2.metric("Tỷ lệ khó khăn trả nợ", f"{float(k['TyLeRuiRo']):.2f}%")
-    c3.metric(f"Khoản vay trung bình ({CURRENCY})", f"{float(k['SoTienVayTB']):,.0f}")
-    c4.metric(f"Thu nhập trung bình ({CURRENCY})", f"{float(k['ThuNhapTB']):,.0f}")
+    c1.metric("📁 Tổng số hồ sơ", f"{int(k['TongHoSo']):,}")
+    c2.metric("⚠️ Tỷ lệ nợ xấu danh mục", f"{float(k['TyLeRuiRo']):.2f}%")
+    c3.metric(f"💵 Khoản vay trung bình", f"{float(k['SoTienVayTB']):,.0f} {CURRENCY}")
+    c4.metric(f"💼 Thu nhập trung bình", f"{float(k['ThuNhapTB']):,.0f} {CURRENCY}")
 
-    st.markdown("### Roll-up: tỷ lệ rủi ro theo nhóm tổ chức")
-    st.caption("Từ tổ chức cụ thể lên nhóm ngành và tổng (view `vw_RuiRo_RollUp_ToChuc`).")
+    st.markdown("<div style='height: 12px;'></div>", unsafe_allow_html=True)
+
+    # Roll-up
+    st.markdown("""
+    <div class="ui-card">
+      <div class="ui-card-title">📈 Roll-up: Tỷ lệ rủi ro nợ xấu theo Nhóm tổ chức làm việc</div>
+      <div class="ui-card-desc">Tổng hợp thứ bậc từ tổ chức chi tiết lên nhóm ngành kinh tế (view <code>vw_RuiRo_RollUp_ToChuc</code>)</div>
+    </div>
+    """, unsafe_allow_html=True)
+
     ro = olap["rollup"]
     groups = ro[(ro["LaTongToanBo"] == 0) & (ro["LaTongNhom"] == 1)].sort_values("TyLeRuiRo_Pct", ascending=False)
-    fig = px.bar(groups, x="NhomToChuc", y="TyLeRuiRo_Pct", color="TyLeRuiRo_Pct", color_continuous_scale="Reds",
-                 labels={"TyLeRuiRo_Pct": "Tỷ lệ rủi ro (%)", "NhomToChuc": "Nhóm tổ chức"})
-    fig.update_layout(xaxis_tickangle=-30)
-    st.plotly_chart(fig)
-    pick = st.selectbox("Drill-down vào một nhóm:", groups["NhomToChuc"].tolist())
-    detail = ro[(ro["NhomToChuc"] == pick) & (ro["LaTongNhom"] == 0)].sort_values("SoHoSo", ascending=False)
-    st.dataframe(detail[["ToChuc", "SoHoSo", "SoHoSoRuiRo", "TyLeRuiRo_Pct", "SoTienVayTrungBinh"]])
+    fig_ro = px.bar(
+        groups, x="NhomToChuc", y="TyLeRuiRo_Pct", color="TyLeRuiRo_Pct",
+        color_continuous_scale="Reds",
+        labels={"TyLeRuiRo_Pct": "Tỷ lệ rủi ro (%)", "NhomToChuc": "Nhóm tổ chức"}
+    )
+    fig_ro.update_layout(xaxis_tickangle=-25)
+    st.plotly_chart(polish_fig(fig_ro, height=360), use_container_width=True)
+
+    c_sel, c_tbl = st.columns([1, 2])
+    with c_sel:
+        pick = st.selectbox("🔎 Drill-down chi tiết từng đơn vị trong nhóm:", groups["NhomToChuc"].tolist())
+        st.caption("Chọn nhóm tổ chức để xem bảng phân rã chi tiết số lượng hồ sơ và nợ xấu.")
+    with c_tbl:
+        detail = ro[(ro["NhomToChuc"] == pick) & (ro["LaTongNhom"] == 0)].sort_values("SoHoSo", ascending=False)
+        st.dataframe(
+            detail[["ToChuc", "SoHoSo", "SoHoSoRuiRo", "TyLeRuiRo_Pct", "SoTienVayTrungBinh"]].rename(
+                columns={
+                    "ToChuc": "Tổ chức / Đơn vị",
+                    "SoHoSo": "Tổng hồ sơ",
+                    "SoHoSoRuiRo": "Hồ sơ nợ xấu",
+                    "TyLeRuiRo_Pct": "Tỷ lệ rủi ro (%)",
+                    "SoTienVayTrungBinh": f"Khoản vay TB ({CURRENCY})",
+                }
+            ),
+            use_container_width=True,
+            height=200,
+        )
+
+    st.markdown("<div style='height: 16px;'></div>", unsafe_allow_html=True)
 
     left, right = st.columns(2)
     with left:
-        st.markdown("### Drill-down: nhóm tuổi → loại thu nhập")
+        st.markdown("""
+        <div class="ui-card">
+          <div class="ui-card-title">👥 Drill-down: Nhóm tuổi → Loại nguồn thu nhập</div>
+          <div class="ui-card-desc">Khảo sát tương quan rủi ro theo phân tầng độ tuổi và tính chất thu nhập</div>
+        </div>
+        """, unsafe_allow_html=True)
         order = ["<25", "25-34", "35-44", "45-54", "55-64", "65+"]
-        st.plotly_chart(px.bar(olap["drill"], x="NhomTuoi", y="TyLeRuiRo_Pct", color="LoaiThuNhap", barmode="group",
-                               category_orders={"NhomTuoi": order},
-                               labels={"TyLeRuiRo_Pct": "Tỷ lệ rủi ro (%)", "NhomTuoi": "Nhóm tuổi"}))
+        fig_dd = px.bar(
+            olap["drill"], x="NhomTuoi", y="TyLeRuiRo_Pct", color="LoaiThuNhap", barmode="group",
+            category_orders={"NhomTuoi": order},
+            labels={"TyLeRuiRo_Pct": "Tỷ lệ rủi ro (%)", "NhomTuoi": "Độ tuổi"}
+        )
+        st.plotly_chart(polish_fig(fig_dd, height=360), use_container_width=True)
+
     with right:
-        st.markdown("### Slice: khách đã từng vay (SoKhoanVayTruoc > 0)")
+        st.markdown("""
+        <div class="ui-card">
+          <div class="ui-card-title">🔍 Slice: Khách hàng từng có lịch sử vay trước đây</div>
+          <div class="ui-card-desc">Lát cắt hồ sơ có <code>SoKhoanVayTruoc > 0</code> theo kỳ hạn và hạng vùng</div>
+        </div>
+        """, unsafe_allow_html=True)
         sl = olap["slice"].copy()
         sl["HangKhuVuc"] = sl["HangKhuVuc"].astype(str)
-        st.plotly_chart(px.scatter(sl, x="NhomKyHan", y="TyLeRuiRo_Pct", size="SoHoSo", color="HangKhuVuc",
-                                   category_orders={"NhomKyHan": ["<=12", "13-24", "25-36", ">36", "Không xác định"]},
-                                   labels={"TyLeRuiRo_Pct": "Tỷ lệ rủi ro (%)", "NhomKyHan": "Kỳ hạn"}))
+        fig_sl = px.scatter(
+            sl, x="NhomKyHan", y="TyLeRuiRo_Pct", size="SoHoSo", color="HangKhuVuc",
+            category_orders={"NhomKyHan": ["<=12", "13-24", "25-36", ">36", "Không xác định"]},
+            labels={"TyLeRuiRo_Pct": "Tỷ lệ rủi ro (%)", "NhomKyHan": "Kỳ hạn vay (tháng)", "HangKhuVuc": "Hạng khu vực"}
+        )
+        st.plotly_chart(polish_fig(fig_sl, height=360), use_container_width=True)
 
     c_heat, c_tier = st.columns([1.2, 0.8])
     with c_heat:
-        st.markdown("### Ma trận: thứ trong tuần × khung giờ")
+        st.markdown("""
+        <div class="ui-card">
+          <div class="ui-card-title">🗓️ Ma trận: Thứ trong tuần × Khung giờ nộp hồ sơ</div>
+          <div class="ui-card-desc">Xác định khung thời gian có tỷ lệ nợ xấu biến động cao nhất</div>
+        </div>
+        """, unsafe_allow_html=True)
         pivot = olap["matrix"].pivot(index="TenThu", columns="NhomGio", values="TyLeRuiRo_Pct")
         pivot = pivot.reindex([d for d in DAYS_ORDER if d in pivot.index])
-        st.plotly_chart(px.imshow(pivot, text_auto=True, aspect="auto", color_continuous_scale="YlOrRd"))
+        fig_hm = px.imshow(
+            pivot, text_auto=True, aspect="auto", color_continuous_scale="YlOrRd",
+            labels=dict(x="Khung giờ", y="Thứ trong tuần", color="% Nợ xấu")
+        )
+        st.plotly_chart(polish_fig(fig_hm, height=320), use_container_width=True)
+
     with c_tier:
-        st.markdown("### Phân bổ hạng rủi ro (điểm ghi vào fact)")
+        st.markdown("""
+        <div class="ui-card">
+          <div class="ui-card-title">🎯 Phân bổ Hạng rủi ro tín dụng</div>
+          <div class="ui-card-desc">Cơ cấu danh mục theo 4 phân vị hạng rủi ro A/B/C/D</div>
+        </div>
+        """, unsafe_allow_html=True)
         scores = olap.get("scores", pd.Series(dtype=float))
         cut = metrics.get("models", {}).get(XGB_NAME, {}).get("tiers", {}).get("cutoffs") if metrics else None
         if len(scores) and cut:
             tier = pd.cut(scores.astype(float), [-np.inf, *cut, np.inf], labels=["A", "B", "C", "D"], right=False)
             dist = tier.value_counts().reindex(["A", "B", "C", "D"]).reset_index()
             dist.columns = ["Hạng", "SoLuong"]
-            st.plotly_chart(px.pie(dist, names="Hạng", values="SoLuong", hole=0.45, color="Hạng",
-                                   color_discrete_map=TIER_COLORS))
-            st.caption("Điểm của hồ sơ thuộc tập huấn luyện là điểm trong mẫu; chất lượng hạng rủi ro "
-                       "đánh giá ở Tab 3 (tập test).")
+            fig_pie = px.pie(
+                dist, names="Hạng", values="SoLuong", hole=0.5, color="Hạng",
+                color_discrete_map=TIER_COLORS
+            )
+            st.plotly_chart(polish_fig(fig_pie, height=320), use_container_width=True)
         else:
-            st.info("Chưa có điểm dự đoán trong fact. Chạy huấn luyện khi đã kết nối SQL Server: "
-                    "python src/dss/credit_scoring_model.py")
+            st.info("💡 Chưa có điểm dự đoán trực tiếp trong Fact. Chạy huấn luyện để cập nhật: `python src/dss/credit_scoring_model.py`")
 
-# ============================================================================= Tab 2
+# ============================================================================= Tab 2: DSS Chấm điểm
 with tab2:
     if not ready:
-        st.error("Chưa có mô hình. Chạy: python src/dss/credit_scoring_model.py")
+        st.error("Chưa có mô hình DSS. Hãy chạy lệnh huấn luyện: `python run_pipeline.py --train`")
     else:
-        st.write("Nhập hồ sơ vay để nhận xác suất rủi ro, khuyến nghị duyệt/từ chối và lý do.")
-        model_type = st.radio("Mô hình:", MODEL_NAMES, horizontal=True,
-                              format_func=lambda m: "XGBoost (chính xác hơn)" if m == XGB_NAME
-                              else "Logistic Regression (dễ diễn giải)")
+        st.markdown("""
+        <div class="ui-card">
+          <div class="ui-card-title">🎯 Thẩm Định Rủi Ro & Ra Quyết Định Tín Dụng</div>
+          <div class="ui-card-desc">Nhập thông tin hồ sơ vay để tính toán xác suất vỡ nợ (PD), quy đổi điểm tín dụng FICO, phân hạng rủi ro và nhận giải thích chuyên sâu (SHAP & Thẻ điểm).</div>
+        </div>
+        """, unsafe_allow_html=True)
 
-        st.markdown("**Ma trận chi phí** (đơn vị tương đối, ví dụ 10 : 1 nghĩa là bỏ sót 1 khách xấu tốn gấp 10 lần "
-                    "từ chối nhầm 1 khách tốt)")
-        cc1, cc2, cc3 = st.columns(3)
-        c_fn = cc1.slider("C_FN: duyệt nhầm khách xấu", 1.0, 50.0, DEFAULT_C_FN, 0.5)
-        c_fp = cc2.slider("C_FP: từ chối nhầm khách tốt", 0.5, 10.0, DEFAULT_C_FP, 0.5)
-        recommended = recommend_threshold(c_fn, c_fp, model_type)
-        cc3.metric("Ngưỡng tối ưu theo chi phí", f"{recommended:.3f}",
-                   help="Chọn trên tập validation: ngưỡng làm tổng chi phí C_FN×FN + C_FP×FP nhỏ nhất.")
-        manual = st.checkbox("Tự chọn ngưỡng thay vì dùng ngưỡng tối ưu")
-        threshold = st.slider("Ngưỡng từ chối (xác suất rủi ro ≥ ngưỡng thì từ chối)", 0.01, 0.90,
-                              float(min(max(recommended, 0.01), 0.90)), 0.005) if manual else recommended
+        col_cfg1, col_cfg2, col_cfg3 = st.columns([1.2, 1.2, 1.2])
+        with col_cfg1:
+            model_type = st.radio(
+                "Mô hình thẩm định:", MODEL_NAMES, horizontal=True,
+                format_func=lambda m: "⚡ XGBoost (Độ chính xác cao)" if m == XGB_NAME else "📊 Logistic Regression (Dễ diễn giải)"
+            )
+        with col_cfg2:
+            c_fn = st.slider("Chi phí bỏ sót khách xấu (C_FN)", 1.0, 50.0, DEFAULT_C_FN, 0.5,
+                             help="Tổn thất khi duyệt nhầm 1 khách hàng vỡ nợ.")
+            c_fp = st.slider("Chi phí từ chối khách tốt (C_FP)", 0.5, 10.0, DEFAULT_C_FP, 0.5,
+                             help="Chi phí cơ hội mất doanh thu khi từ chối 1 khách tốt.")
+        with col_cfg3:
+            recommended = recommend_threshold(c_fn, c_fp, model_type)
+            st.metric("🎯 Ngưỡng tối ưu chi phí", f"{recommended:.3f}",
+                      help="Ngưỡng xác suất tối thiểu hóa tổn thất kỳ vọng C_FN×FN + C_FP×FP trên validation.")
+            manual = st.checkbox("Tự tinh chỉnh ngưỡng phê duyệt")
+            threshold = st.slider("Ngưỡng từ chối áp dụng", 0.01, 0.90,
+                                  float(min(max(recommended, 0.01), 0.90)), 0.005) if manual else recommended
 
-        st.markdown("#### Thông tin hồ sơ")
+        st.markdown("<div style='height: 8px;'></div>", unsafe_allow_html=True)
+
+        # Form nhập hồ sơ
         with st.form("loan_form"):
+            st.markdown("#### 📝 Phiếu Thông Tin Thẩm Định Hồ Sơ Vay")
             f1, f2, f3 = st.columns(3)
             with f1:
-                st.markdown("**Nhân khẩu**")
+                st.markdown("**1. Thông tin nhân khẩu**")
                 gender = st.selectbox("Giới tính", OPTIONS["gioi_tinh"])
-                age = st.number_input("Tuổi", 18, 80, 35)
-                edu = st.selectbox("Học vấn", OPTIONS["trinh_do"], index=1)
-                marital = st.selectbox("Hôn nhân", OPTIONS["tinh_trang_hon_nhan"])
-                house = st.selectbox("Nhà ở", OPTIONS["loai_nha_o"])
+                age = st.number_input("Tuổi của người vay", 18, 80, 35)
+                edu = st.selectbox("Trình độ học vấn", OPTIONS["trinh_do"], index=1)
+                marital = st.selectbox("Tình trạng hôn nhân", OPTIONS["tinh_trang_hon_nhan"])
+                house = st.selectbox("Tình trạng nhà ở", OPTIONS["loai_nha_o"])
             with f2:
-                st.markdown("**Nghề nghiệp & thu nhập**")
-                income_type = st.selectbox("Loại thu nhập", OPTIONS["loai_thu_nhap"])
-                org = st.selectbox("Nhóm tổ chức", ORG_GROUPS, index=ORG_GROUPS.index("Doanh nghiệp tư nhân"))
-                tenure = st.number_input("Thâm niên (năm)", 0.0, 50.0, 4.5, 0.5)
-                income = st.number_input(f"Thu nhập hàng năm ({CURRENCY})", 20_000, 3_000_000, 150_000, 5_000)
-                region = st.selectbox("Hạng khu vực (1 tốt nhất, 3 kém nhất)", [1, 2, 3], index=1)
+                st.markdown("**2. Nghề nghiệp & Thu nhập**")
+                income_type = st.selectbox("Nguồn thu nhập chính", OPTIONS["loai_thu_nhap"])
+                org = st.selectbox("Lĩnh vực / Nhóm tổ chức", ORG_GROUPS, index=ORG_GROUPS.index("Doanh nghiệp tư nhân"))
+                tenure = st.number_input("Thâm niên làm việc (năm)", 0.0, 50.0, 4.5, 0.5)
+                income = st.number_input(f"Thu nhập hàng năm ({CURRENCY})", 20_000, 5_000_000, 150_000, 5_000)
+                region = st.selectbox("Hạng khu vực sinh sống (1: Cao, 3: Thấp)", [1, 2, 3], index=1)
             with f3:
-                st.markdown("**Khoản vay & lịch sử tín dụng**")
-                contract = st.selectbox("Loại hợp đồng", OPTIONS["loai_hop_dong"])
-                credit = st.number_input(f"Số tiền vay ({CURRENCY})", 20_000, 4_500_000, 500_000, 10_000)
-                annuity = st.number_input(f"Tiền trả hàng kỳ ({CURRENCY})", 1_000, 250_000, 25_000, 1_000)
-                goods = st.number_input(f"Giá trị hàng hóa ({CURRENCY})", 0, 4_500_000, 450_000, 10_000)
-                prior = st.number_input("Số khoản vay trước đây tại Home Credit", 0, 30, 1)
-                refused = st.number_input("Trong đó bị từ chối", 0, 30, 0)
-                bureau = st.number_input("Số khoản tín dụng ở tổ chức khác", 0, 50, 2)
-            st.markdown("**Điểm tín dụng ngoài** (bỏ chọn nếu hồ sơ không có điểm, mô hình sẽ xử lý như dữ liệu thiếu)")
+                st.markdown("**3. Khoản vay & Lịch sử tín dụng**")
+                contract = st.selectbox("Loại hình hợp đồng vay", OPTIONS["loai_hop_dong"])
+                credit = st.number_input(f"Số tiền đề nghị vay ({CURRENCY})", 20_000, 5_000_000, 500_000, 10_000)
+                annuity = st.number_input(f"Tiền trả định kỳ ({CURRENCY})", 1_000, 300_000, 25_000, 1_000)
+                goods = st.number_input(f"Giá trị hàng hóa mua ({CURRENCY})", 0, 5_000_000, 450_000, 10_000)
+                prior = st.number_input("Số khoản vay trước tại tổ chức", 0, 30, 1)
+                refused = st.number_input("Trong đó từng bị từ chối", 0, 30, 0)
+                bureau = st.number_input("Số khoản tín dụng ghi nhận tại CIC/Bureau", 0, 50, 2)
+
+            st.markdown("---")
+            st.markdown("**4. Điểm tín dụng từ tổ chức xếp hạng bên ngoài (External Credit Scores)**")
             e1, e2, e3 = st.columns(3)
-            use1 = e1.checkbox("Có điểm 1", value=False)
+            use1 = e1.checkbox("Có điểm nguồn ngoài 1", value=False)
             ext1 = e1.slider("Điểm ngoài 1", 0.0, 1.0, 0.5, 0.01)
-            use2 = e2.checkbox("Có điểm 2", value=True)
+            use2 = e2.checkbox("Có điểm nguồn ngoài 2", value=True)
             ext2 = e2.slider("Điểm ngoài 2", 0.0, 1.0, 0.55, 0.01)
-            use3 = e3.checkbox("Có điểm 3", value=False)
+            use3 = e3.checkbox("Có điểm nguồn ngoài 3", value=False)
             ext3 = e3.slider("Điểm ngoài 3", 0.0, 1.0, 0.5, 0.01)
-            submitted = st.form_submit_button("Đánh giá hồ sơ")
+
+            submitted = st.form_submit_button("⚡ TIẾN HÀNH THẨM ĐỊNH HỒ SƠ", type="primary", use_container_width=True)
 
         if submitted:
             if refused > prior:
-                st.error("Số khoản bị từ chối không thể lớn hơn tổng số khoản vay trước đây.")
+                st.error("Lỗi logic: Số khoản bị từ chối không thể lớn hơn tổng số khoản vay trước đây.")
             else:
                 st.session_state["profile"] = {
                     "gioi_tinh": gender, "tuoi": age, "trinh_do": edu, "tinh_trang_hon_nhan": marital,
@@ -279,70 +663,108 @@ with tab2:
         if profile:
             result = predict_risk(profile, nguong=threshold, model_type=model_type)
             tier = result["hang_rui_ro"]
-            st.markdown("### Kết quả")
-            r1, r2 = st.columns([1, 1.3])
-            with r1:
-                approved = result["quyet_dinh"] == "DUYET"
-                (st.success if approved else st.error)(
-                    f"**Khuyến nghị: {'DUYỆT' if approved else 'TỪ CHỐI'}**  \n"
-                    f"Hạng {tier} ({TIER_TEXT[tier]})")
-                m_a, m_b = st.columns(2)
-                m_a.metric("Xác suất khó khăn trả nợ", f"{result['xac_suat_rui_ro'] * 100:.2f}%")
-                m_b.metric("Điểm tín dụng (300-850)", f"{result['diem_tin_dung']:.0f}")
+            approved = result["quyet_dinh"] == "DUYET"
+
+            st.markdown("<div style='height: 16px;'></div>", unsafe_allow_html=True)
+            st.markdown("### 📋 Kết Quả Phân Tích & Khuyến Nghị Thẩm Định")
+
+            r_left, r_right = st.columns([1.1, 1.3])
+            with r_left:
+                box_class = "approved" if approved else "rejected"
+                status_icon = "✅" if approved else "⛔"
+                status_text = "CHẤP THUẬN DUYỆT VAY" if approved else "TỪ CHỐI CẤP TÍN DỤNG"
+                st.markdown(f"""
+                <div class="decision-box {box_class}">
+                  <div style="font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.9;">Khuyến Nghị Hệ Thống</div>
+                  <div class="decision-status">{status_icon} {status_text}</div>
+                  <div class="decision-tier">Hạng {tier} — {TIER_TEXT[tier]}</div>
+                </div>
+                """, unsafe_allow_html=True)
+
+                k1, k2 = st.columns(2)
+                with k1:
+                    st.markdown(f"""
+                    <div class="score-card">
+                      <div class="score-number">{result['diem_tin_dung']:.0f}</div>
+                      <div class="score-label">Điểm Tín Dụng (300-850)</div>
+                    </div>
+                    """, unsafe_allow_html=True)
+                with k2:
+                    st.markdown(f"""
+                    <div class="score-card">
+                      <div class="score-number" style="color: {'#10B981' if approved else '#EF4444'};">{result['xac_suat_rui_ro'] * 100:.2f}%</div>
+                      <div class="score-label">Xác Suất Vỡ Nợ (PD)</div>
+                    </div>
+                    """, unsafe_allow_html=True)
+
+                st.markdown("<div style='height: 8px;'></div>", unsafe_allow_html=True)
                 st.progress(min(1.0, result["xac_suat_rui_ro"]))
-                st.caption(f"Ngưỡng áp dụng: {result['nguong_su_dung']} | Mô hình: {result['mo_hinh_su_dung']}. "
-                           "Đây là khuyến nghị hỗ trợ thẩm định viên, không phải quyết định tự động.")
-            with r2:
+                st.caption(f"Ngưỡng phê duyệt: **{result['nguong_su_dung']}** | Mô hình: **{result['mo_hinh_su_dung']}**")
+
+            with r_right:
                 contrib = result["shap_contributions"]
                 if contrib:
                     dfc = pd.DataFrame(contrib).sort_values("shap_value")
                     dfc["Tác động"] = np.where(dfc["shap_value"] > 0, "Tăng rủi ro", "Giảm rủi ro")
-                    fig = px.bar(dfc, x="shap_value", y="feature", color="Tác động", orientation="h",
-                                 color_discrete_map={"Tăng rủi ro": "#EF4444", "Giảm rủi ro": "#10B981"},
-                                 labels={"shap_value": "Đóng góp vào log-odds", "feature": ""})
-                    fig.update_layout(height=320, margin=dict(l=10, r=10, t=30, b=10),
-                                      title=f"Yếu tố ảnh hưởng ({result['phuong_phap_giai_thich']})")
-                    st.plotly_chart(fig)
+                    fig_shap = px.bar(
+                        dfc, x="shap_value", y="feature", color="Tác động", orientation="h",
+                        color_discrete_map={"Tăng rủi ro": "#EF4444", "Giảm rủi ro": "#10B981"},
+                        labels={"shap_value": "Mức độ ảnh hưởng (Log-odds)", "feature": "Đặc trưng hồ sơ"}
+                    )
+                    st.plotly_chart(polish_fig(fig_shap, height=310, title=f"Yếu tố tác động chính ({result['phuong_phap_giai_thich']})"), use_container_width=True)
                 else:
-                    st.info(f"Chưa có giải thích: {result['phuong_phap_giai_thich']}")
+                    st.info(f"Chưa có phân tích giải thích: {result['phuong_phap_giai_thich']}")
 
             # ------------------------------------------------------------ Thẻ điểm
-            st.markdown("---")
-            st.markdown("### Thẻ điểm tín dụng (Logistic Regression)")
-            st.caption("Điểm = điểm cơ sở + tổng điểm của từng yếu tố (cộng được chính xác vì Logistic Regression là mô hình "
-                       "tuyến tính). Thang điểm: 600 điểm ứng với tỷ lệ khách tốt : xấu = 50 : 1, cứ +20 điểm thì tỷ lệ gấp đôi. "
-                       "Các tham số này là quy ước, không rút ra từ dữ liệu.")
+            st.markdown("<div style='height: 12px;'></div>", unsafe_allow_html=True)
+            st.markdown("""
+            <div class="ui-card">
+              <div class="ui-card-title">💳 Thẻ Điểm Tín Dụng Cộng Tính (Logistic Regression Scorecard)</div>
+              <div class="ui-card-desc">Điểm tín dụng = Điểm cơ sở + Tổng điểm từng tiêu chí thẩm định (Quy ước: 600 điểm ứng với tỷ lệ Tốt:Xấu = 50:1, PDO = 20 điểm)</div>
+            </div>
+            """, unsafe_allow_html=True)
+
             sc = scorecard_breakdown(profile)
-            k1, k2, k3 = st.columns(3)
-            k1.metric("Điểm tín dụng (thẻ điểm)", f"{sc['diem_tin_dung']:.0f}")
-            k2.metric("Điểm cơ sở", f"{sc['base_points']:.0f}")
-            k3.metric("Xác suất rủi ro (LR)", f"{sc['xac_suat_rui_ro'] * 100:.2f}%")
+            sk1, sk2, sk3 = st.columns(3)
+            sk1.metric("Điểm thẻ tín dụng tổng hợp", f"{sc['diem_tin_dung']:.0f}")
+            sk2.metric("Điểm nền tảng (Base Score)", f"{sc['base_points']:.0f}")
+            sk3.metric("Xác suất nợ xấu quy đổi (PD-LR)", f"{sc['xac_suat_rui_ro'] * 100:.2f}%")
+
             card = pd.DataFrame(sc["items"])
             card["Tác động"] = np.where(card["diem"] >= 0, "Cộng điểm", "Trừ điểm")
-            top = card.head(10).sort_values("diem")
-            fig = px.bar(top, x="diem", y="feature", color="Tác động", orientation="h",
-                         color_discrete_map={"Cộng điểm": "#10B981", "Trừ điểm": "#EF4444"},
-                         labels={"diem": "Điểm cộng/trừ", "feature": ""})
-            fig.update_layout(height=340, margin=dict(l=10, r=10, t=30, b=10), title="10 yếu tố ảnh hưởng điểm nhiều nhất")
-            st.plotly_chart(fig)
-            with st.expander("Bảng điểm đầy đủ"):
-                st.dataframe(card[["feature", "gia_tri", "diem"]].rename(
-                    columns={"feature": "Yếu tố", "gia_tri": "Giá trị nhập", "diem": "Điểm"}).round(1))
-                st.caption(f"Điểm cơ sở {sc['base_points']:.1f} + tổng điểm các yếu tố = {sc['total_unclipped']:.1f} "
-                           "(hiển thị giới hạn trong khoảng 300-850).")
+            top_card = card.head(10).sort_values("diem")
+            fig_sc = px.bar(
+                top_card, x="diem", y="feature", color="Tác động", orientation="h",
+                color_discrete_map={"Cộng điểm": "#10B981", "Trừ điểm": "#EF4444"},
+                labels={"diem": "Điểm cộng / trừ", "feature": "Tiêu chí thẩm định"}
+            )
+            st.plotly_chart(polish_fig(fig_sc, height=330, title="Top 10 tiêu chí tác động điểm tín dụng mạnh nhất"), use_container_width=True)
+
+            with st.expander("🔍 Xem toàn bộ bảng kê phân bổ điểm chi tiết của hồ sơ"):
+                st.dataframe(
+                    card[["feature", "gia_tri", "diem"]].rename(
+                        columns={"feature": "Yếu tố thẩm định", "gia_tri": "Dữ liệu khai báo", "diem": "Điểm số"}
+                    ).round(1),
+                    use_container_width=True
+                )
 
             # ------------------------------------------------------------ What-If
-            st.markdown("---")
-            st.markdown("### Phân tích giả định (What-If): điều chỉnh khoản vay")
-            st.caption("Giả định lãi suất không đổi: tiền trả hàng kỳ mới = tiền trả cũ × (vay mới / vay cũ) × "
-                       "(kỳ hạn cũ / kỳ hạn mới). Chỉ điều chỉnh những thứ ngân hàng thật sự thương lượng được "
-                       "(số tiền, kỳ hạn); điểm tín dụng ngoài và thu nhập không thay đổi.")
+            st.markdown("<div style='height: 12px;'></div>", unsafe_allow_html=True)
+            st.markdown("""
+            <div class="ui-card">
+              <div class="ui-card-title">🔄 Phân Tích Giả Định (What-If Analysis) — Tối Ưu Hóa Gói Vay</div>
+              <div class="ui-card-desc">Thử nghiệm tái cấu trúc số tiền vay và kỳ hạn thanh toán để tìm ra phương án tối ưu giúp hồ sơ đạt ngưỡng phê duyệt.</div>
+            </div>
+            """, unsafe_allow_html=True)
+
             cur_months = max(1, term_months(profile["so_tien_vay"], profile["tien_tra_hang_ky"]))
             options = [6, 12, 18, 24, 36, 48, 60, 84, 120]
             w1, w2 = st.columns(2)
-            pct = w1.slider("Số tiền vay mới (% so với đề nghị)", 20, 130, 80, 5)
-            new_months = w2.select_slider("Kỳ hạn mới (tháng)", options=options,
-                                          value=min(options, key=lambda m: abs(m - cur_months)))
+            pct = w1.slider("Điều chỉnh số tiền vay (% so với ban đầu)", 20, 130, 80, 5)
+            new_months = w2.select_slider(
+                "Kỳ hạn vay đề xuất mới (tháng)", options=options,
+                value=min(options, key=lambda m: abs(m - cur_months))
+            )
 
             def variant(credit_pct: float, months: int) -> dict:
                 p = dict(profile)
@@ -354,13 +776,18 @@ with tab2:
                 return p
 
             what = predict_risk(variant(pct, new_months), nguong=threshold, model_type=model_type, explain=False)
-            m1, m2, m3 = st.columns(3)
-            m1.metric("Xác suất gốc", f"{result['xac_suat_rui_ro'] * 100:.2f}%")
-            m2.metric("Xác suất theo giả định", f"{what['xac_suat_rui_ro'] * 100:.2f}%",
-                      delta=f"{(what['xac_suat_rui_ro'] - result['xac_suat_rui_ro']) * 100:+.2f} điểm %",
-                      delta_color="inverse")
-            m3.metric("Khuyến nghị theo giả định", "DUYỆT" if what["quyet_dinh"] == "DUYET" else "TỪ CHỐI",
-                      help=f"Hạng {what['hang_rui_ro']}")
+            wm1, wm2, wm3 = st.columns(3)
+            wm1.metric("Xác suất nợ xấu ban đầu", f"{result['xac_suat_rui_ro'] * 100:.2f}%")
+            wm2.metric(
+                "Xác suất sau khi điều chỉnh", f"{what['xac_suat_rui_ro'] * 100:.2f}%",
+                delta=f"{(what['xac_suat_rui_ro'] - result['xac_suat_rui_ro']) * 100:+.2f} %",
+                delta_color="inverse"
+            )
+            wm3.metric(
+                "Khuyến nghị phương án mới",
+                "✅ DUYỆT" if what["quyet_dinh"] == "DUYET" else "⛔ TỪ CHỐI",
+                help=f"Hạng rủi ro mới: {what['hang_rui_ro']}"
+            )
 
             best = None
             for step in range(100, 19, -5):
@@ -369,204 +796,241 @@ with tab2:
                     best = step
                     break
             if best is None:
-                st.warning(f"Với kỳ hạn {new_months} tháng, ngay cả khoản vay 20% đề nghị vẫn bị từ chối.")
+                st.warning(f"⚠️ Với kỳ hạn {new_months} tháng, ngay cả khi giảm khoản vay xuống 20% thì hồ sơ vẫn vượt ngưỡng rủi ro cho phép.")
             elif best == 100:
-                st.info(f"Với kỳ hạn {new_months} tháng, đề nghị vay nguyên mức đã đạt ngưỡng duyệt.")
+                st.success(f"🎉 Với kỳ hạn {new_months} tháng, khoản vay ở mức 100% ban đầu hoàn toàn đủ điều kiện phê duyệt.")
             else:
-                st.info(f"Với kỳ hạn {new_months} tháng, mức vay lớn nhất đạt ngưỡng duyệt khoảng "
-                        f"{best}% đề nghị (≈ {profile['so_tien_vay'] * best / 100:,.0f} {CURRENCY}).")
+                st.info(f"💡 **Gợi ý từ hệ thống:** Với kỳ hạn {new_months} tháng, hạn mức vay tối đa có thể phê duyệt an toàn là **{best}%** (tương đương **{profile['so_tien_vay'] * best / 100:,.0f} {CURRENCY}**).")
 
-# ============================================================================= Tab 3
+# ============================================================================= Tab 3: Đánh giá mô hình
 with tab3:
     if not ready or not metrics:
-        st.warning("Chưa có số liệu mô hình. Chạy: python src/dss/credit_scoring_model.py")
+        st.warning("Chưa có số liệu mô hình. Hãy chạy huấn luyện: `python run_pipeline.py --train`")
     else:
         meta = metrics["meta"]
-        st.caption(f"Train {meta['n_train']:,} | Validation {meta['n_val']:,} | Test {meta['n_test']:,} | "
-                   f"tỷ lệ nợ xấu {meta['base_rate_pct']}%. Ngưỡng và hạng rủi ro chọn trên validation; "
-                   "mọi số liệu dưới đây tính trên tập test.")
+        st.caption(f"📊 Tập huấn luyện: **{meta['n_train']:,}** | Validation: **{meta['n_val']:,}** | Test độc lập: **{meta['n_test']:,}** | Tỷ lệ nợ xấu: **{meta['base_rate_pct']}%**")
+
         mm = metrics["models"]
-        rows = [{"Mô hình": n, "ROC-AUC": r["roc_auc"], "PR-AUC": r["pr_auc"], "Brier": r["brier"],
-                 "Ngưỡng (10:1)": r["optimal_threshold"], "Precision": r["precision"], "Recall": r["recall"],
-                 "F1": r["f1_score"]} for n, r in mm.items()]
-        st.markdown("#### 1. So sánh mô hình")
-        st.dataframe(pd.DataFrame(rows))
-        st.caption("ROC-AUC/PR-AUC đo khả năng xếp hạng. Brier càng nhỏ càng tốt, đo độ tin cậy của xác suất. "
-                   "Precision/Recall/F1 tính tại ngưỡng tối ưu theo chi phí 10:1.")
+        rows = [{
+            "Mô hình": n, "ROC-AUC": r["roc_auc"], "PR-AUC": r["pr_auc"], "Brier Score": r["brier"],
+            "Ngưỡng (10:1)": r["optimal_threshold"], "Precision": r["precision"], "Recall": r["recall"],
+            "F1-Score": r["f1_score"]
+        } for n, r in mm.items()]
+
+        st.markdown("""
+        <div class="ui-card">
+          <div class="ui-card-title">🏆 1. So Sánh Năng Lực Dự Báo Của Các Mô Hình</div>
+          <div class="ui-card-desc">ROC-AUC đo năng lực phân hạng; Brier Score đo độ chuẩn xác xác suất; Precision/Recall tính tại ngưỡng tối ưu chi phí 10:1.</div>
+        </div>
+        """, unsafe_allow_html=True)
+        st.dataframe(pd.DataFrame(rows), use_container_width=True)
 
         col_roc, col_cal = st.columns(2)
         with col_roc:
-            st.markdown("#### 2. Đường ROC")
-            fig = go.Figure()
+            st.markdown("""
+            <div class="ui-card">
+              <div class="ui-card-title">📈 2. Đường Cong ROC (Receiver Operating Characteristic)</div>
+            </div>
+            """, unsafe_allow_html=True)
+            fig_roc = go.Figure()
             for n in MODEL_NAMES:
                 if n in roc:
-                    fig.add_trace(go.Scatter(x=roc[n]["fpr"], y=roc[n]["tpr"], mode="lines",
-                                             name=f"{n} (AUC {roc[n]['auc']:.3f})"))
-            fig.add_trace(go.Scatter(x=[0, 1], y=[0, 1], mode="lines", name="Ngẫu nhiên",
-                                     line=dict(dash="dot", color="gray")))
-            fig.update_layout(xaxis_title="Tỷ lệ báo nhầm (FPR)", yaxis_title="Tỷ lệ bắt đúng nợ xấu (TPR)")
-            st.plotly_chart(fig)
+                    fig_roc.add_trace(go.Scatter(x=roc[n]["fpr"], y=roc[n]["tpr"], mode="lines", name=f"{n} (AUC = {roc[n]['auc']:.3f})"))
+            fig_roc.add_trace(go.Scatter(x=[0, 1], y=[0, 1], mode="lines", name="Ngẫu nhiên", line=dict(dash="dot", color="#94a3b8")))
+            fig_roc.update_layout(xaxis_title="Tỷ lệ dự đoán nhầm (FPR)", yaxis_title="Tỷ lệ bắt trúng nợ xấu (TPR)")
+            st.plotly_chart(polish_fig(fig_roc, height=350), use_container_width=True)
+
         with col_cal:
-            st.markdown("#### 3. Hiệu chỉnh xác suất")
-            sel = st.radio("Mô hình", MODEL_NAMES, horizontal=True, key="cal_model")
+            st.markdown("""
+            <div class="ui-card">
+              <div class="ui-card-title">🎯 3. Hiệu Chuẩn Xác Suất (Calibration Curve)</div>
+            </div>
+            """, unsafe_allow_html=True)
+            sel = st.radio("Mô hình kiểm tra:", MODEL_NAMES, horizontal=True, key="cal_model")
             cal = pd.DataFrame(mm[sel]["calibration"])
-            fig = go.Figure()
-            fig.add_trace(go.Scatter(x=cal["pred"], y=cal["actual"], mode="lines+markers", name="Thực tế"))
+            fig_cal = go.Figure()
+            fig_cal.add_trace(go.Scatter(x=cal["pred"], y=cal["actual"], mode="lines+markers", name="Xác suất thực tế", marker=dict(color="#2563eb", size=7)))
             top = max(cal["pred"].max(), cal["actual"].max()) * 1.1
-            fig.add_trace(go.Scatter(x=[0, top], y=[0, top], mode="lines", name="Hiệu chỉnh hoàn hảo",
-                                     line=dict(dash="dot", color="gray")))
-            fig.update_layout(xaxis_title="Xác suất dự đoán trung bình", yaxis_title="Tỷ lệ nợ xấu thực tế")
-            st.plotly_chart(fig)
+            fig_cal.add_trace(go.Scatter(x=[0, top], y=[0, top], mode="lines", name="Hiệu chuẩn lý tưởng (y = x)", line=dict(dash="dot", color="#94a3b8")))
+            fig_cal.update_layout(xaxis_title="Xác suất dự đoán trung bình", yaxis_title="Tỷ lệ nợ xấu thực tế")
+            st.plotly_chart(polish_fig(fig_cal, height=350), use_container_width=True)
 
-        st.markdown("#### 4. Hạng rủi ro A/B/C/D (theo phân vị xác suất, kiểm tra trên tập test)")
+        st.markdown("""
+        <div class="ui-card">
+          <div class="ui-card-title">🏷️ 4. Kiểm Định Bậc Phân Hạng Rủi Ro A / B / C / D Trên Tập Test</div>
+          <div class="ui-card-desc">Mô hình đạt chuẩn khi tỷ lệ nợ xấu thực tế tăng dần một cách đơn điệu từ hạng A đến hạng D.</div>
+        </div>
+        """, unsafe_allow_html=True)
         tier_df = pd.DataFrame(mm[sel]["tiers"]["table"]).rename(columns={
-            "tier": "Hạng", "n": "Số hồ sơ", "share_pct": "% hồ sơ", "default_rate_pct": "% nợ xấu thực tế"})
-        st.dataframe(tier_df)
-        st.caption("Hạng tốt thì tỷ lệ nợ xấu thực tế phải tăng dần từ A đến D.")
+            "tier": "Hạng rủi ro", "n": "Số lượng hồ sơ", "share_pct": "Tỷ trọng danh mục (%)", "default_rate_pct": "Tỷ lệ nợ xấu thực tế (%)"
+        })
+        st.dataframe(tier_df, use_container_width=True)
 
-        st.markdown("#### 5. Hiệu quả theo ma trận chi phí")
-        st.caption("Thay đổi C_FN và C_FP để xem ngưỡng tối ưu và tổng chi phí thay đổi thế nào. "
-                   "Ngưỡng được chọn trên validation, chi phí tính trên test.")
+        st.markdown("<div style='height: 12px;'></div>", unsafe_allow_html=True)
+        st.markdown("""
+        <div class="ui-card">
+          <div class="ui-card-title">💰 5. Tối Ưu Hóa Chi Phí Rủi Ro Tín Dụng (Cost-Sensitive Matrix)</div>
+          <div class="ui-card-desc">Thiết lập ma trận chi phí để đo lường mức độ cắt giảm tổn thất tài chính khi áp dụng hệ thống DSS.</div>
+        </div>
+        """, unsafe_allow_html=True)
+
         p1, p2, p3 = st.columns(3)
-        c_fn3 = p1.slider("C_FN", 1.0, 50.0, DEFAULT_C_FN, 0.5, key="t3_fn")
-        c_fp3 = p2.slider("C_FP", 0.5, 10.0, DEFAULT_C_FP, 0.5, key="t3_fp")
-        model3 = p3.radio("Mô hình dùng", MODEL_NAMES, key="t3_model")
+        c_fn3 = p1.slider("Chi phí bỏ sót khách xấu (C_FN)", 1.0, 50.0, DEFAULT_C_FN, 0.5, key="t3_fn")
+        c_fp3 = p2.slider("Chi phí từ chối khách tốt (C_FP)", 0.5, 10.0, DEFAULT_C_FP, 0.5, key="t3_fp")
+        model3 = p3.radio("Mô hình kiểm định chi phí:", MODEL_NAMES, key="t3_model", horizontal=True)
         thr3 = recommend_threshold(c_fn3, c_fp3, model3)
         pol = evaluate_policy(c_fn3, c_fp3, thr3, model3)
 
         b1, b2, b3, b4 = st.columns(4)
         b1.metric("Ngưỡng tối ưu", f"{thr3:.3f}")
         b2.metric("Chi phí khi duyệt tất cả", f"{pol['cost_approve_all']:,.0f}")
-        b3.metric("Chi phí khi dùng DSS", f"{pol['cost']:,.0f}", delta=f"{-pol['savings_pct_vs_approve_all']:.1f}%",
-                  delta_color="inverse")
+        b3.metric("Chi phí khi áp dụng DSS", f"{pol['cost']:,.0f}", delta=f"{-pol['savings_pct_vs_approve_all']:.1f}%", delta_color="inverse")
         b4.metric("Chi phí khi từ chối tất cả", f"{pol['cost_reject_all']:,.0f}")
-        st.write(f"DSS từ chối {pol['reject_rate_pct']:.1f}% hồ sơ và bắt được {pol['bad_caught_pct']:.1f}% khách xấu. "
-                 f"So với phương án đơn giản tốt nhất (duyệt hết hoặc từ chối hết), chi phí giảm "
-                 f"{pol['savings_pct_vs_best_baseline']:.1f}%.")
 
         cm_col, curve_col = st.columns(2)
         with cm_col:
             labels = ["Khách tốt (0)", "Nợ xấu (1)"]
-            fig = px.imshow(pol["confusion_matrix"], text_auto=True, x=["Duyệt", "Từ chối"], y=labels,
-                            color_continuous_scale="Blues",
-                            labels=dict(x="Quyết định của DSS", y="Thực tế", color="Số hồ sơ"))
-            fig.update_layout(title=f"Ma trận nhầm lẫn tại ngưỡng {thr3:.3f}")
-            st.plotly_chart(fig)
+            fig_cm = px.imshow(
+                pol["confusion_matrix"], text_auto=True, x=["Duyệt", "Từ chối"], y=labels,
+                color_continuous_scale="Blues",
+                labels=dict(x="Quyết định DSS", y="Thực tế", color="Số hồ sơ")
+            )
+            st.plotly_chart(polish_fig(fig_cm, height=330, title=f"Ma trận nhầm lẫn tại ngưỡng tối ưu {thr3:.3f}"), use_container_width=True)
+
         with curve_col:
             curve = threshold_curve(c_fn3, c_fp3, model3)
-            fig = px.line(curve, x="threshold", y="cost", labels={"threshold": "Ngưỡng", "cost": "Tổng chi phí"})
-            fig.add_vline(x=thr3, line_dash="dash", line_color="#EF4444")
-            fig.update_layout(title="Tổng chi phí theo ngưỡng")
-            st.plotly_chart(fig)
+            fig_tc = px.line(curve, x="threshold", y="cost", labels={"threshold": "Ngưỡng xác suất", "cost": "Tổng chi phí tổn thất"})
+            fig_tc.add_vline(x=thr3, line_dash="dash", line_color="#EF4444", annotation_text=f"Tối ưu: {thr3:.3f}")
+            st.plotly_chart(polish_fig(fig_tc, height=330, title="Đường cong chi phí theo ngưỡng cắt (Cost Curve)"), use_container_width=True)
 
-        st.markdown("#### 6. Điểm tín dụng và tỷ lệ nợ xấu theo dải điểm (tập test)")
-        st.caption("Điểm đổi từ xác suất theo công thức thẻ điểm. Thẻ điểm tốt thì tỷ lệ nợ xấu giảm dần khi điểm tăng.")
+        st.markdown("<div style='height: 12px;'></div>", unsafe_allow_html=True)
+        st.markdown("""
+        <div class="ui-card">
+          <div class="ui-card-title">📊 6. Tỷ Lệ Nợ Xấu Phân Bổ Theo Dải Điểm Tín Dụng (Decile Calibration)</div>
+          <div class="ui-card-desc">Thẻ điểm đạt chuẩn quốc tế khi điểm tín dụng càng cao thì tỷ lệ nợ xấu thực tế giảm dần đều.</div>
+        </div>
+        """, unsafe_allow_html=True)
+
         fs = load_eval_frame("test", sel)
         fs["diem"] = pd_to_score(fs["p"])
         fs["dai"] = pd.qcut(fs["diem"], 10, duplicates="drop")
         band = fs.groupby("dai", observed=True).agg(so_ho_so=("y", "size"), no_xau=("y", "mean"),
                                                     diem_tb=("diem", "mean")).reset_index()
         band["Dải điểm"] = band["dai"].astype(str)
-        band["% nợ xấu thực tế"] = (band["no_xau"] * 100).round(2)
-        st.plotly_chart(px.bar(band, x="Dải điểm", y="% nợ xấu thực tế", color="% nợ xấu thực tế",
-                               color_continuous_scale="Reds"))
-        st.dataframe(band[["Dải điểm", "so_ho_so", "diem_tb", "% nợ xấu thực tế"]].rename(
-            columns={"so_ho_so": "Số hồ sơ", "diem_tb": "Điểm trung bình"}).round(1))
+        band["% Nợ xấu thực tế"] = (band["no_xau"] * 100).round(2)
+        fig_band = px.bar(
+            band, x="Dải điểm", y="% Nợ xấu thực tế", color="% Nợ xấu thực tế",
+            color_continuous_scale="Reds",
+            labels={"% Nợ xấu thực tế": "Tỷ lệ nợ xấu (%)", "Dải điểm": "Phân vị dải điểm tín dụng"}
+        )
+        st.plotly_chart(polish_fig(fig_band, height=340), use_container_width=True)
 
-# ============================================================================= Tab 4
+# ============================================================================= Tab 4: Chiến lược danh mục & EL
 with tab4:
     if not ready or not metrics:
-        st.error("Chưa có mô hình. Chạy: python src/dss/credit_scoring_model.py")
+        st.error("Chưa có mô hình. Hãy chạy huấn luyện trước.")
     else:
-        m4 = st.radio("Mô hình", MODEL_NAMES, horizontal=True, key="t4_model")
+        m4 = st.radio("Mô hình phân tích danh mục:", MODEL_NAMES, horizontal=True, key="t4_model")
         test4, val4 = load_eval_frame("test", m4), load_eval_frame("val", m4)
         base_rate = float(test4["y"].mean() * 100)
-        st.caption("Mọi số liệu trên tab này tính trên tập TEST (hồ sơ mô hình chưa từng thấy).")
 
-        # ---- 1. Đường cong chiến lược duyệt vay
-        st.markdown("### 1. Đường cong chiến lược duyệt vay")
-        st.caption("Duyệt theo thứ tự từ rủi ro thấp đến cao: duyệt càng nhiều thì khối lượng cho vay càng lớn nhưng "
-                   "tỷ lệ nợ xấu trong danh mục càng tăng.")
+        st.markdown("""
+        <div class="ui-card">
+          <div class="ui-card-title">📈 1. Đường Cong Chiến Lược Phê Duyệt Vay (Trade-off Strategy Curve)</div>
+          <div class="ui-card-desc">Thẩm định danh mục từ rủi ro thấp đến cao: Đánh đổi giữa quy mô giải ngân và chất lượng nợ xấu của danh mục.</div>
+        </div>
+        """, unsafe_allow_html=True)
+
         curve = approval_curve(test4["y"], test4["p"])
-        target = st.slider("Tỷ lệ duyệt mục tiêu (%)", 10, 100, 70, 1, key="t4_rate")
+        target = st.slider("Tỷ lệ phê duyệt mục tiêu của danh mục (%)", 10, 100, 70, 1, key="t4_rate")
         row = curve[curve["approve_rate_pct"] == target].iloc[0]
+
         a1, a2, a3, a4 = st.columns(4)
-        a1.metric("Nợ xấu của danh mục được duyệt", f"{row['bad_rate_pct']:.2f}%",
-                  delta=f"{row['bad_rate_pct'] - base_rate:+.2f} điểm % so với duyệt hết", delta_color="inverse")
-        a2.metric("Nợ xấu bị chặn lại", f"{row['bad_blocked_pct']:.1f}%")
-        a3.metric("Hồ sơ bị từ chối", f"{100 - target}%")
-        a4.metric("Xác suất rủi ro tối đa chấp nhận", f"{row['max_risk_accepted'] * 100:.2f}%")
-        fig = go.Figure()
-        fig.add_trace(go.Scatter(x=curve["approve_rate_pct"], y=curve["bad_rate_pct"], name="% nợ xấu của danh mục được duyệt"))
-        fig.add_trace(go.Scatter(x=curve["approve_rate_pct"], y=curve["bad_blocked_pct"], name="% nợ xấu đã chặn được",
-                                 yaxis="y2", line=dict(dash="dot")))
-        fig.add_vline(x=target, line_dash="dash", line_color="#EF4444")
-        fig.update_layout(xaxis_title="Tỷ lệ hồ sơ được duyệt (%)", yaxis_title="% nợ xấu của danh mục",
-                          yaxis2=dict(title="% nợ xấu đã chặn", overlaying="y", side="right", range=[0, 100]),
-                          legend=dict(orientation="h", y=-0.25))
-        st.plotly_chart(fig)
+        a1.metric("Nợ xấu của danh mục duyệt", f"{row['bad_rate_pct']:.2f}%",
+                  delta=f"{row['bad_rate_pct'] - base_rate:+.2f}% vs duyệt hết", delta_color="inverse")
+        a2.metric("Nợ xấu đã chặn lại", f"{row['bad_blocked_pct']:.1f}%")
+        a3.metric("Tỷ lệ từ chối", f"{100 - target}%")
+        a4.metric("Mức rủi ro tối đa chấp nhận", f"{row['max_risk_accepted'] * 100:.2f}%")
+
+        fig_cur = go.Figure()
+        fig_cur.add_trace(go.Scatter(x=curve["approve_rate_pct"], y=curve["bad_rate_pct"], name="% Nợ xấu danh mục duyệt", line=dict(color="#2563eb", width=3)))
+        fig_cur.add_trace(go.Scatter(x=curve["approve_rate_pct"], y=curve["bad_blocked_pct"], name="% Nợ xấu chặn được", yaxis="y2", line=dict(dash="dot", color="#059669")))
+        fig_cur.add_vline(x=target, line_dash="dash", line_color="#EF4444", annotation_text=f"Mục tiêu {target}%")
+        fig_cur.update_layout(
+            xaxis_title="Tỷ lệ duyệt hồ sơ (%)", yaxis_title="% Nợ xấu danh mục",
+            yaxis2=dict(title="% Nợ xấu chặn được", overlaying="y", side="right", range=[0, 100]),
+            legend=dict(orientation="h", y=-0.2)
+        )
+        st.plotly_chart(polish_fig(fig_cur, height=360), use_container_width=True)
+
         marg = approval_marginal(curve, 5).rename(columns={
             "approve_rate_pct": "Duyệt đến (%)", "bad_rate_portfolio_pct": "% nợ xấu danh mục", "added_n": "Hồ sơ thêm",
-            "marginal_bad_rate_pct": "% nợ xấu của lát thêm", "max_risk_accepted": "Rủi ro tối đa chấp nhận"})
-        st.dataframe(marg.round(3))
-        st.caption("Cột '% nợ xấu của lát thêm' cho biết duyệt thêm từng lát 5% hồ sơ đánh đổi bao nhiêu rủi ro.")
+            "marginal_bad_rate_pct": "% nợ xấu của lát thêm", "max_risk_accepted": "Rủi ro tối đa chấp nhận"
+        })
+        with st.expander("📊 Xem bảng chi tiết biên độ rủi ro khi tăng tỷ lệ duyệt thêm mỗi 5%"):
+            st.dataframe(marg.round(3), use_container_width=True)
 
-        # ---- 2. Tổn thất kỳ vọng
-        st.markdown("---")
-        st.markdown("### 2. Tổn thất kỳ vọng (Expected Loss)")
-        st.caption("EL = PD × LGD × EAD, với PD là xác suất rủi ro của mô hình, EAD là số tiền vay và LGD là tỷ lệ mất vốn khi "
-                   "vỡ nợ. **LGD là giả định có thể chỉnh, không rút ra từ dữ liệu.** 'Tổn thất thực tế quy ước' = nhãn × LGD × EAD, "
-                   "dùng để đối chiếu với EL.")
-        lgd = st.slider("LGD: tỷ lệ mất vốn khi vỡ nợ (%)", 10, 100, int(DEFAULT_LGD * 100), 5, key="t4_lgd") / 100
+        st.markdown("<div style='height: 12px;'></div>", unsafe_allow_html=True)
+        st.markdown("""
+        <div class="ui-card">
+          <div class="ui-card-title">🛡️ 2. Mô Hình Tổn Thất Kỳ Vọng (Expected Loss: EL = PD × LGD × EAD)</div>
+          <div class="ui-card-desc">Ước tính giá trị tổn thất tài chính thực tế và dự phòng rủi ro cho danh mục tín dụng theo chuẩn Basel II/III.</div>
+        </div>
+        """, unsafe_allow_html=True)
+
+        lgd = st.slider("Tỷ lệ tổn thất khi vỡ nợ (LGD - Loss Given Default) (%)", 10, 100, int(DEFAULT_LGD * 100), 5, key="t4_lgd") / 100
         pol = el_policy(test4, target, lgd)
         e1, e2, e3, e4 = st.columns(4)
-        e1.metric(f"EL nếu duyệt tất cả ({CURRENCY})", f"{pol['el_all']:,.0f}")
-        e2.metric(f"EL khi duyệt {target}%", f"{pol['el_approved']:,.0f}")
-        e3.metric("EL tránh được", f"{pol['el_avoided']:,.0f}",
-                  help=f"Dư nợ bị từ chối chiếm {pol['ead_rejected_pct']:.1f}% tổng dư nợ đề nghị.")
-        e4.metric("EL / dư nợ (duyệt vs hết)", f"{pol['el_rate_approved_pct']:.2f}% vs {pol['el_rate_all_pct']:.2f}%")
+        e1.metric(f"Tổn thất nếu duyệt 100%", f"{pol['el_all']:,.0f} {CURRENCY}")
+        e2.metric(f"Tổn thất khi duyệt {target}%", f"{pol['el_approved']:,.0f} {CURRENCY}")
+        e3.metric("Tổn thất rủi ro tránh được", f"{pol['el_avoided']:,.0f} {CURRENCY}",
+                  help=f"Dư nợ từ chối chiếm {pol['ead_rejected_pct']:.1f}% tổng dư nợ.")
+        e4.metric("Tỷ lệ EL / Dư nợ", f"{pol['el_rate_approved_pct']:.2f}% (vs {pol['el_rate_all_pct']:.2f}%)")
+
         cuts = metrics["models"][m4]["tiers"]["cutoffs"]
         test4["hang"] = tiers_from_cutoffs(test4["p"], cuts)
         by_tier = el_summary(test4, lgd, test4["hang"]).rename(columns={
-            "nhom": "Hạng", "n": "Số hồ sơ", "ead": "Dư nợ", "el": "EL", "realized": "Tổn thất thực tế quy ước",
-            "el_rate_pct": "EL/dư nợ (%)", "realized_rate_pct": "Thực tế/dư nợ (%)", "el_over_realized": "EL ÷ thực tế"})
-        st.markdown("**EL theo hạng rủi ro**")
-        st.dataframe(by_tier.round(2))
-        by_group = el_summary(test4, lgd, test4["NhomToChuc"]).sort_values("el_rate_pct", ascending=False)
-        st.markdown("**EL theo nhóm tổ chức (liên kết với roll-up ở Tab 1)**")
-        st.plotly_chart(px.bar(by_group, x="nhom", y="el_rate_pct", color="el_rate_pct", color_continuous_scale="Reds",
-                               labels={"nhom": "Nhóm tổ chức", "el_rate_pct": "EL / dư nợ (%)"}))
-        st.caption("EL ÷ thực tế gần 1 nghĩa là xác suất được hiệu chỉnh tốt. Nhóm có ít hồ sơ thì tỷ lệ dao động mạnh.")
+            "nhom": "Hạng rủi ro", "n": "Số hồ sơ", "ead": "Dư nợ", "el": "Tổn thất kỳ vọng (EL)", "realized": "Tổn thất thực tế",
+            "el_rate_pct": "EL / Dư nợ (%)", "realized_rate_pct": "Thực tế / Dư nợ (%)", "el_over_realized": "Tỷ số EL ÷ Thực tế"
+        })
+        st.markdown("**Bảng phân tích EL theo Hạng rủi ro:**")
+        st.dataframe(by_tier.round(2), use_container_width=True)
 
-        # ---- 3. Ngưỡng theo phân khúc
-        st.markdown("---")
-        st.markdown("### 3. Ngưỡng riêng theo phân khúc")
-        st.caption("Chọn ngưỡng riêng cho từng phân khúc trên tập validation, đo chi phí trên tập test, rồi so với một ngưỡng chung. "
-                   "Phân khúc quá nhỏ dùng ngưỡng chung để tránh khớp quá mức.")
-        seg_names = {"TenLoai": "Loại hợp đồng", "NhomTuoi": "Nhóm tuổi", "LoaiThuNhap": "Loại thu nhập",
-                     "NhomToChuc": "Nhóm tổ chức"}
+        st.markdown("<div style='height: 12px;'></div>", unsafe_allow_html=True)
+        st.markdown("""
+        <div class="ui-card">
+          <div class="ui-card-title">🎯 3. Phân Đoạn Chiến Lược Cắt Ngưỡng Theo Phân Khúc Khách Hàng</div>
+          <div class="ui-card-desc">Thiết lập ngưỡng riêng biệt cho từng phân khúc để tối đa hóa lợi nhuận danh mục.</div>
+        </div>
+        """, unsafe_allow_html=True)
+
+        seg_names = {
+            "TenLoai": "Loại hình hợp đồng", "NhomTuoi": "Nhóm tuổi người vay",
+            "LoaiThuNhap": "Tính chất nguồn thu nhập", "NhomToChuc": "Lĩnh vực kinh tế"
+        }
         sg1, sg2, sg3 = st.columns(3)
-        seg = sg1.selectbox("Phân khúc", list(seg_names), format_func=lambda k: seg_names[k], key="t4_seg")
-        c_fn4 = sg2.slider("C_FN", 1.0, 50.0, DEFAULT_C_FN, 0.5, key="t4_fn")
-        c_fp4 = sg3.slider("C_FP", 0.5, 10.0, DEFAULT_C_FP, 0.5, key="t4_fp")
+        seg = sg1.selectbox("Tiêu chí phân đoạn:", list(seg_names), format_func=lambda k: seg_names[k], key="t4_seg")
+        c_fn4 = sg2.slider("C_FN (phân khúc)", 1.0, 50.0, DEFAULT_C_FN, 0.5, key="t4_fn")
+        c_fp4 = sg3.slider("C_FP (phân khúc)", 0.5, 10.0, DEFAULT_C_FP, 0.5, key="t4_fp")
         thr_global = recommend_threshold(c_fn4, c_fp4, m4)
         seg_table, totals = segment_thresholds(val4, test4, seg, c_fn4, c_fp4, thr_global)
-        s1, s2, s3 = st.columns(3)
-        s1.metric("Chi phí với ngưỡng chung", f"{totals['cost_global']:,.0f}", help=f"Ngưỡng chung = {thr_global:.3f}")
-        s2.metric("Chi phí với ngưỡng riêng", f"{totals['cost_segment']:,.0f}")
-        s3.metric("Chênh lệch", f"{totals['saving']:,.0f}", delta=f"{totals['saving_pct']:+.2f}%")
-        st.dataframe(seg_table.rename(columns={
-            "segment": "Phân khúc", "n_val": "Hồ sơ validation", "n_test": "Hồ sơ test",
-            "bad_rate_test_pct": "% nợ xấu (test)", "thr_segment": "Ngưỡng riêng", "thr_global": "Ngưỡng chung",
-            "dung_nguong_rieng": "Dùng ngưỡng riêng", "cost_segment": "Chi phí riêng", "cost_global": "Chi phí chung",
-            "saving": "Tiết kiệm"}).round(3))
-        if totals["saving"] > 0:
-            st.success("Ngưỡng riêng theo phân khúc giảm chi phí trên tập test so với một ngưỡng chung.")
-        else:
-            st.info("Ngưỡng riêng không giúp ích rõ rệt ở cấu hình này. Đây cũng là một kết luận hợp lệ: "
-                    "một ngưỡng chung đã đủ tốt hoặc phân khúc chưa đủ dữ liệu để tách riêng.")
 
-# ============================================================================= Tab 5
+        s1, s2, s3 = st.columns(3)
+        s1.metric("Chi phí khi dùng chung 1 ngưỡng", f"{totals['cost_global']:,.0f}")
+        s2.metric("Chi phí khi tối ưu theo phân khúc", f"{totals['cost_segment']:,.0f}")
+        s3.metric("Mức tiết kiệm chi phí", f"{totals['saving']:,.0f}", delta=f"{totals['saving_pct']:+.2f}%")
+
+        st.dataframe(
+            seg_table.rename(columns={
+                "segment": "Phân khúc", "n_val": "Hồ sơ val", "n_test": "Hồ sơ test",
+                "bad_rate_test_pct": "% nợ xấu test", "thr_segment": "Ngưỡng riêng", "thr_global": "Ngưỡng chung",
+                "dung_nguong_rieng": "Áp dụng riêng", "cost_segment": "Chi phí riêng", "cost_global": "Chi phí chung",
+                "saving": "Mức tiết kiệm"
+            }).round(3),
+            use_container_width=True
+        )
+
+# ============================================================================= Tab 5: Giám sát PSI
 @st.cache_data
 def load_current_features():
     return load_dataset(None)
@@ -574,19 +1038,25 @@ def load_current_features():
 
 with tab5:
     if not ready:
-        st.error("Chưa có mô hình. Chạy: python src/dss/credit_scoring_model.py")
+        st.error("Chưa có mô hình để thực hiện kiểm tra PSI.")
     else:
-        st.markdown("### Giám sát dịch chuyển dữ liệu (PSI)")
-        st.caption("PSI so sánh phân bố của dữ liệu mới với tập huấn luyện. Quy ước: dưới 0,1 ổn định; 0,1 đến 0,25 cần chú ý; "
-                   "trên 0,25 dịch chuyển lớn. PSI cho biết dữ liệu ĐÃ ĐỔI, không cho biết mô hình sai (cần nhãn thực mới đánh giá được).")
+        st.markdown("""
+        <div class="ui-card">
+          <div class="ui-card-title">🔍 Giám Sát Độ Lệch Phân Bố Dữ Liệu (Population Stability Index - PSI)</div>
+          <div class="ui-card-desc">Đo lường sự dịch chuyển của dữ liệu vận hành thực tế so với dữ liệu huấn luyện nền tảng (Baseline). Chuẩn mực: PSI &lt; 0.1: Ổn định | 0.1 - 0.25: Cần lưu ý | &gt; 0.25: Dịch chuyển lớn (Model Drift).</div>
+        </div>
+        """, unsafe_allow_html=True)
+
         base = load_psi_baseline()
-        choice = st.radio("Dữ liệu cần kiểm tra", [
-            "Mẫu ngẫu nhiên từ dữ liệu hiện có (kiểm tra cơ sở, kỳ vọng gần 0)",
-            "Một phân khúc của dữ liệu hiện có (mô phỏng dịch chuyển)",
-            "Tải file mới (CSV/Parquet đúng định dạng features_v1)"], key="t5_src")
+        choice = st.radio("Chọn tập dữ liệu cần kiểm tra độ dịch chuyển:", [
+            "Mẫu ngẫu nhiên từ dữ liệu vận hành (Kiểm tra cơ sở, kỳ vọng PSI ≈ 0)",
+            "Một phân khúc dữ liệu cụ thể (Mô phỏng trường hợp dịch chuyển thị trường)",
+            "Tải lên file dữ liệu mới (CSV / Parquet)"
+        ], key="t5_src")
+
         df_new = None
         if choice.startswith("Tải"):
-            up = st.file_uploader("File dữ liệu mới", type=["csv", "parquet"])
+            up = st.file_uploader("Chọn file dữ liệu mới", type=["csv", "parquet"])
             if up is not None:
                 df_new = pd.read_parquet(up) if up.name.endswith(".parquet") else pd.read_csv(up)
         else:
@@ -594,44 +1064,44 @@ with tab5:
                 all_df = load_current_features()
             except FileNotFoundError:
                 all_df = None
-                st.warning("Chưa có data/shared/features_v1.parquet. Chạy ETL trước.")
+                st.warning("Chưa tìm thấy file `data/shared/features_v1.parquet`.")
             if all_df is not None:
                 if choice.startswith("Mẫu"):
                     df_new = all_df.sample(min(5000, len(all_df)), random_state=7)
                 else:
                     ps1, ps2 = st.columns(2)
-                    col = ps1.selectbox("Cột phân khúc", ["NhomTuoi", "LoaiThuNhap", "NhomToChuc", "TenLoai", "HangKhuVuc"],
-                                        key="t5_col")
-                    val = ps2.selectbox("Giá trị", sorted(all_df[col].dropna().unique().tolist()), key="t5_val")
+                    col = ps1.selectbox("Đặc trưng phân đoạn:", ["NhomTuoi", "LoaiThuNhap", "NhomToChuc", "TenLoai", "HangKhuVuc"], key="t5_col")
+                    val = ps2.selectbox("Giá trị phân đoạn:", sorted(all_df[col].dropna().unique().tolist()), key="t5_val")
                     df_new = all_df[all_df[col] == val]
+
         if df_new is not None and len(df_new):
             if len(df_new) < 500:
-                st.warning(f"Chỉ có {len(df_new):,} hồ sơ: PSI trên mẫu nhỏ dao động mạnh, hãy diễn giải thận trọng.")
+                st.warning(f"⚠️ Mẫu hiện tại chỉ có {len(df_new):,} hồ sơ. PSI trên cỡ mẫu nhỏ có thể biến thiên mạnh.")
             try:
                 scores_new = {n: score_frame(df_new, n) for n in MODEL_NAMES}
                 score_psi, feat_psi = psi_report(base, df_new, scores_new)
             except ValueError as exc:
                 st.error(str(exc))
             else:
-                st.caption(f"Dữ liệu mới: {len(df_new):,} hồ sơ | Dữ liệu chuẩn (train): {base['n_train']:,} hồ sơ")
+                st.caption(f"📁 Mẫu kiểm tra: **{len(df_new):,}** hồ sơ | Dữ liệu nền tảng huấn luyện: **{base['n_train']:,}** hồ sơ")
                 cols = st.columns(len(score_psi))
                 for c, r in zip(cols, score_psi.itertuples()):
-                    c.metric(f"PSI điểm rủi ro: {r.mo_hinh}", f"{r.psi:.3f}", help=r.trang_thai)
-                    c.caption(r.trang_thai)
+                    c.metric(f"PSI Điểm: {r.mo_hinh}", f"{r.psi:.3f}")
+                    c.caption(f"Trạng thái: **{r.trang_thai}**")
+
                 feat_psi["Đặc trưng"] = feat_psi["feature"].map(lambda k: FEATURE_LABELS.get(k, k))
-                top = feat_psi.head(15).sort_values("psi")
-                fig = px.bar(top, x="psi", y="Đặc trưng", color="trang_thai", orientation="h",
-                             color_discrete_map={"Ổn định": "#10B981", "Cần chú ý": "#F59E0B", "Dịch chuyển lớn": "#EF4444"},
-                             labels={"psi": "PSI", "trang_thai": "Trạng thái"})
-                fig.add_vline(x=0.1, line_dash="dot", line_color="#F59E0B")
-                fig.add_vline(x=0.25, line_dash="dot", line_color="#EF4444")
-                fig.update_layout(title="15 đặc trưng có PSI cao nhất")
-                st.plotly_chart(fig)
-                st.dataframe(feat_psi[["Đặc trưng", "psi", "trang_thai"]].rename(
-                    columns={"psi": "PSI", "trang_thai": "Trạng thái"}).round(4))
-                if (score_psi["psi"] >= 0.25).any() or (feat_psi["psi"] >= 0.25).any():
-                    st.error("Có dịch chuyển lớn. Hãy kiểm tra nguồn dữ liệu và cân nhắc huấn luyện lại mô hình.")
-                elif (score_psi["psi"] >= 0.1).any() or (feat_psi["psi"] >= 0.1).any():
-                    st.warning("Có dấu hiệu dịch chuyển. Nên theo dõi thêm và đối chiếu với kết quả thực tế khi có nhãn.")
-                else:
-                    st.success("Dữ liệu mới ổn định so với tập huấn luyện.")
+                top_psi = feat_psi.head(15).sort_values("psi")
+                fig_psi = px.bar(
+                    top_psi, x="psi", y="Đặc trưng", color="trang_thai", orientation="h",
+                    color_discrete_map={"Ổn định": "#10B981", "Cần chú ý": "#F59E0B", "Dịch chuyển lớn": "#EF4444"},
+                    labels={"psi": "Chỉ số PSI", "trang_thai": "Trạng thái"}
+                )
+                fig_psi.add_vline(x=0.1, line_dash="dot", line_color="#F59E0B", annotation_text="0.10: Chú ý")
+                fig_psi.add_vline(x=0.25, line_dash="dot", line_color="#EF4444", annotation_text="0.25: Cảnh báo")
+                st.plotly_chart(polish_fig(fig_psi, height=380, title="Top 15 đặc trưng có mức dịch chuyển PSI cao nhất"), use_container_width=True)
+
+                with st.expander("📋 Xem bảng kê chỉ số PSI đầy đủ của tất cả các biến đặc trưng"):
+                    st.dataframe(
+                        feat_psi[["Đặc trưng", "psi", "trang_thai"]].rename(columns={"psi": "Chỉ số PSI", "trang_thai": "Đánh giá"}).round(4),
+                        use_container_width=True
+                    )
