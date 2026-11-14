@@ -357,7 +357,15 @@ def aggregate_from_parquet(df: pd.DataFrame) -> dict:
         "drill": _rate(df, ["NhomTuoi", "LoaiThuNhap"], {"SoTienVayTrungBinh": ("SoTienVay", "mean")}),
         "slice": _rate(prev, ["NhomKyHan", "HangKhuVuc"]),
         "matrix": _rate(df, ["TenThu", "NhomGio"]),
-        "scores": df["DiemRuiRoDuDoan"].dropna() if "DiemRuiRoDuDoan" in df.columns else pd.Series(dtype=float),
+        "scores": (
+            df["DiemRuiRoDuDoan"].dropna()
+            if "DiemRuiRoDuDoan" in df.columns and len(df["DiemRuiRoDuDoan"].dropna()) > 0
+            else (
+                pd.read_parquet(os.path.join(MODELS_DIR, "eval_frame.parquet"))["p_xgb"].dropna()
+                if os.path.exists(os.path.join(MODELS_DIR, "eval_frame.parquet"))
+                else pd.Series(dtype=float)
+            )
+        ),
         "source": "Parquet (chế độ độc lập không SQL Server)",
     }
 

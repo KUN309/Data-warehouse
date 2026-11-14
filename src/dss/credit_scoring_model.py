@@ -275,8 +275,21 @@ def train_models(df: pd.DataFrame | None = None, models_dir: str | None = None,
         json.dump(psi_baseline, f, ensure_ascii=False)
     print(f"Đã lưu mô hình và số liệu vào {models_dir}")
 
-    if write_back and engine is not None:
-        write_back_predictions(engine, model_xgb, df)
+    if write_back:
+        if engine is not None:
+            write_back_predictions(engine, model_xgb, df)
+        else:
+            shared_parquet = os.path.join(SHARED_DIR, "features_v1.parquet")
+            if os.path.exists(shared_parquet):
+                try:
+                    print("Ghi điểm dự đoán vào features_v1.parquet (chế độ offline) ...")
+                    probs = np.round(model_xgb.predict_proba(df[NUMERIC_FEATURES + CATEGORICAL_FEATURES])[:, 1], 5)
+                    df_parquet = pd.read_parquet(shared_parquet)
+                    df_parquet["DiemRuiRoDuDoan"] = probs
+                    df_parquet.to_parquet(shared_parquet, index=False)
+                    print("   Đã cập nhật DiemRuiRoDuDoan vào features_v1.parquet.")
+                except Exception as exc:
+                    print(f"   KHÔNG ghi được điểm vào parquet: {exc}")
     return metrics
 
 
